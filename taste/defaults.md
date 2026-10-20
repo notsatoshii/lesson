@@ -1,6 +1,8 @@
 # Known-good defaults
 
-For when the brief is silent. The house rules (`lesson.md`, CLAUDE.md), the brief and the owner's taste file win over all of this. The numbers are working conventions from planning practice, not research claims; they give a critic something to compare against and the editor a place to start. Age limits come from `taste/age-bands.md`; this file never loosens them.
+For when the brief is silent. The house rules (`lesson.md`, CLAUDE.md), the brief and the owner's taste file win over all of this. Age limits come from `taste/age-bands.md`; this file never loosens them.
+
+**Caps and ratios here are house defaults.** Minute caps, segment lengths, active-to-passive ratios, words per screen, type sizes and beat splits are working conventions from planning practice, not research claims. They give a critic something to compare against and the editor a place to start. A breach on the number alone is severity 2 at most; severity 1 needs a concrete harm on top (the plan cannot run in its slot, a learner loses dignity, something is unsafe), and the finding quotes this file or `age-bands.md` as the source of the number.
 
 ## Time, by band
 
@@ -41,6 +43,9 @@ A video's try is a pause prompt with the answer after it; its apply is a task th
 - No timer on judgement questions. Timers only where speed is the skill.
 - Right answers get the reason too, in one line, so a lucky guess still teaches.
 - In live mode the loop is a material or a partner, not the teacher: a checklist, an answer card, a self-correcting layout.
+- Every question says how all learners answer at once (write-down, whiteboard, poll, chat, pair). The first wrong answer is private: own screen, own whiteboard or a pair.
+- Praise names the competence shown ("you caught both edge cases"), not the effort or the finishing.
+- One early line sets expectations: the try segments will feel harder than listening, and that is the point.
 
 ## Game layer, by mode
 
@@ -52,7 +57,18 @@ A video's try is a pause prompt with the answer after it; its apply is a task th
 | guide | progress checkpoints only (step n of N, visible) | none | none |
 | talk | none; a single take-home challenge at the close | none | none |
 
-Never: points for attendance, XP for self-reported anything, public ranking of individuals in A–C and E–G, daily streaks with penalties.
+Rules that hold in every mode:
+
+- **Rewards** are informational (they name the competence shown) or a surprise tied to an event in the lesson. None is promised in advance for doing or finishing a task; in A–B, "a sticker appears when the character's problem is solved", never "finish and you get a sticker".
+- **Competition** is between teams, inside the story frame, with individual feedback on each learner's own work. Individual head-to-heads are opt-in, against a benchmark or the learner's own earlier result.
+- **Any ranking** (leaderboard, team table, top-N) is paired with supportive individual feedback, and the plan says what the learner or team at the bottom sees.
+- **Streaks** count any of several learning actions, include a freeze or repair, never announce a break, and are absent from band G.
+- **Choices:** two to four small ones per lesson (example, order, path, material); more than one for A–C; no reward attached to the choice itself.
+- **Award rules live in the plan.** When a quiz tool or class app runs the layer, the plan names each mechanic's award rule and mode (team or individual, speed or accuracy, named or anonymous).
+- **Course mode: change the game layer around week 4.** A course longer than four weeks schedules a change in the game layer around week 4 (a new mechanic, a new level, a new story beat), because interest in a game layer drops after about four weeks before it recovers. A one-off lesson needs none.
+- **Band G:** every mechanic is chosen with learners of this age, or the plan says how it is checked with them in the first session.
+
+Never: points for attendance, XP for self-reported anything, rewards promised in advance for doing or finishing, public ranking of individuals in A–C and E–G, a ranking with no supportive feedback, mandatory badges plus a public leaderboard, daily streaks with penalties, any streak in band G.
 
 ## Story
 
@@ -60,14 +76,27 @@ Never: points for attendance, XP for self-reported anything, public ranking of i
 - Stakes shown in the hook, not announced: what goes wrong without the skill, as a situation.
 - One callback in reward, to the hook's situation or to the guide's mistake.
 - A–B: the character's problem. C–D: a scenario the learner could be in next year. E–G: the learner's own work or life, this week.
+- A–B guide character: reacts to what the learner just did, stays the same across segments, has a problem the learner helps solve.
+- The concept happens in the story's events (what happened, to whom, with what consequence), not in a list beside it. The frame passes the story spine: its "but one day" and "until finally" can be filled from the plan.
+- Scenario decisions show what happens next before any verdict; wrong options are things a real colleague would do.
 - The story never carries a fact. Facts are in the plan's facts list; the story is around them.
 
 ## Humour
 
 - Dry understatement, written to be read silently; no laugh pause.
-- One beat per segment at most. None in check, safety or consent moments.
-- Targets: the tool, the narrator, the guide character, the absurdity of the task. Never a learner, never the group.
+- Related to the content only: a joke about the concept or the task. No warm-up or mood-change joke unrelated to the content.
+- One beat per segment at most. None in check, safety or consent moments. One related beat just before the first try segment, where it lowers the cost of a wrong first move.
+- Targets: the tool, the narrator's slip with a tool, the guide character, the absurdity of the task. Never a learner, never the group.
+- Narrator self-deprecation: one beat per lesson at most, about a tool or task slip, never about competence in the subject.
+- The band can resolve the joke unaided; a joke the plan has to explain is cut.
+- Band B: a deadpan adult who is wrong, never a sarcastic narrator. 아재개그 only in A–B and only on the content word.
 - Band-specific registers are in `age-bands.md`; when unsure, cut the joke.
+
+## Loop budget
+
+- **Token cap: 2M tokens per run** (one `/lesson` invocation, all cycles and critics included) when the house rules and the brief set none. The house rules' token budget, when present, replaces it.
+- Reaching the cap stops the loop with `stop: cap` at the end of the current cycle; the best-so-far plan is the one kept, and the cycle report header shows `tokens: cycle / total / cap`.
+- Like the other numbers here, the cap is a house default, not a measured limit.
 
 ## Media
 
@@ -119,3 +148,7 @@ Korean: 존댓말 unless the house rules say otherwise; write from intent, not f
 - Pace options named in the plan: what a fast learner does next, what a slow learner skips, in every try and apply segment.
 - Online: operable by keyboard and by screen reader; focus visible; no motion that cannot be paused.
 - Video: pause points announced on screen, not only in the voice.
+
+## Sources for the evidence-backed lines
+
+Rewards, rankings, competition, choice, streaks and band rules: see the sources list in `age-bands.md`. Game-layer change around week 4: [Rodrigues et al. 2022](https://doi.org/10.1186/s41239-021-00314-6). "Expect effort" line: [Deslauriers et al. 2019](https://openlab.citytech.cuny.edu/gamelab/files/2023/01/Deslauriersa-et-al-2019.pdf). Related humour helps, unrelated adds nothing: [Wanzer, Frymier & Irwin 2010](https://doi.org/10.1080/03634520903367238); [허영주 2011](https://www.newnonmun.com/article=193373). Self-deprecation cap: [NCA](https://natcom.org/node/1236). Concept in the events: [Mar et al. 2021](https://doi.org/10.3758/s13423-020-01853-1); [Sundararajan & Adesope 2020](https://doi.org/10.1007/s10648-020-09522-4). Everything else in this file is house convention.

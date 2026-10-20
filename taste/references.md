@@ -13,6 +13,9 @@ Teaching that has held up. For each: the mechanic to learn and one line on why i
 | Tabletop game masters (Dungeons & Dragons) | C–F | A narrator sets a situation, the players choose, the world answers with consequences; the narrator keeps a voice and improvises around the plan. | Choice makes the learner the agent of the lesson; consequence is feedback that does not feel like grading. |
 | Sal Khan-style worked examples | all | The teacher solves a real problem aloud, writing as they think, including the wrong turn and the recovery. | Learners see the method rather than the answer; the visible mistake lowers the price of their own. |
 | Cooking classes | E–G | Everything measured out before the heat goes on, numbered steps, the finished dish shown before anyone starts. | Preparation removes the panic step; the picture of the result is the check at every stage. |
+| Dan Meyer's three acts ([post](https://blog.mrmeyer.com/2011/the-three-acts-of-a-mathematical-story/), [talk](https://www.ted.com/talks/dan_meyer_math_class_needs_a_makeover), [task bank](http://threeacts.mrmeyer.com/)) | B–E | Act one is a picture or short clip with almost no words and the shortest possible question; learners guess first. Act two: information is given only when learners ask for it ("be less helpful"). Act three shows the real answer against their guess, with a sequel ready for early finishers. | The learner builds the problem, so they want the answer; the reveal pays off the guess the hook created. |
+| [Inside Mathematics public lessons](https://www.insidemathematics.org/classroom-videos) | A–D | Whole recorded lessons by practising teachers, from kindergarten counting to algebra modelling, with a cycle of inquiry, instruction, assessment, analysis and re-engagement. Watch what the teacher does right after a formative check. | It shows a whole lesson arc, not a highlight clip, including the re-engaging move most plans leave out. |
+| Oak National Academy lessons ([Curriculum API](https://open-api.thenational.academy/docs), [lesson rules](https://raw.githubusercontent.com/oaknational/oak-ai-lesson-assistant/main/packages/core/src/prompts/lesson-assistant/parts/body.ts)) | A–D | Whole lessons (slides, quizzes, transcripts) built to fixed limits: an "I can…" outcome of at most 30 words, 2 to 3 learning cycles that each start with a verb, 1 to 3 misconceptions each with a one-sentence correction, a starter and an exit quiz. | The limits are checkable, so the plan's shape can be tested before anyone teaches it. Open Government Licence: attribute Oak; its trademarks are excluded. |
 
 ## Self-paced online
 
@@ -25,6 +28,7 @@ Teaching that has held up. For each: the mechanic to learn and one line on why i
 | [Scratch](https://scratch.mit.edu) | B–C | Blocks only snap together when valid, the run button is always one tap away, and remixing someone else's project is the first move. | Syntax cannot be wrong, so all the thinking goes into logic; the remix makes the blank page disappear. |
 | [Anki](https://apps.ankiweb.net) and spaced repetition | D–G | Each item returns on a schedule set by how hard the learner found it last time; a card holds the smallest possible question. | The schedule, not the learner's mood, decides what gets reviewed. |
 | [Advent of Code](https://adventofcode.com) | D–E | One puzzle a day; the second half twists the first so a quick solution has to be rethought. | The twist teaches the design lesson the first half let the learner skip. |
+| Nicky Case's [explorable explanations](https://blog.ncase.me/explorable-explanations/) | C–F | Do, Show, Tell: text for abstract ideas, graphs for relationships, animation for change over time, an interactive only for a process or system. Each mechanic is taught on its own before they combine, and the finale uses everything. | Interaction is spent only where a static picture would fail, so every click teaches; the finale proves the parts were learned. |
 
 ## Video
 
@@ -35,6 +39,9 @@ Teaching that has held up. For each: the mechanic to learn and one line on why i
 | Crash Course | C–E | Narrative pace, a host with a voice, a recap, and visual gags that restate the point. | Pace and personality keep a long topic watchable; the gag is a second encoding of the same idea. |
 | Mister Rogers' Neighborhood, Sesame Street | A | Slow pace, direct address to one child, repetition on purpose, a character who gets things wrong and is corrected kindly. | Repetition is the mechanic at this age, and the wrong character makes being wrong safe. |
 | Khan Academy-style tablet videos | B–E | Handwriting appears as the thought happens; nothing is pre-drawn. | Watching the mark appear keeps the viewer solving along. |
+| Derek Muller's misconception videos ([study](https://openjournals.library.sydney.edu.au/IISME/article/view/6345), Veritasium's [learning-styles video](https://www.veritasium.com/videos/2021/7/9/the-biggest-myth-in-education)) | C–F | The common wrong belief is voiced before the explanation, often as a dialogue between the wrong view and the right one; a moment of confusion is planned in. | A smooth, clear explanation can leave the wrong idea untouched and give a false sense of knowing; naming it makes the viewer do the work of changing it. |
+| The 1타 instructor pattern (Korean star online-lecture teachers; [analysis](https://www.theteams.kr/teams/40089/post/71093)) | C–E | Show the thinking, including the false start and the recovery, not only the clean solution; state the trigger ("when you see X, think Y"); split the course into entry, deeper and review tiers with a stated entry point so nobody has to 완강. For an AI-workflow course: show the prompt that failed before the one that worked. | The trigger makes the method reusable on a new problem, and the visible false start lowers the price of the learner's own. |
+| [Coursera's video numbers](https://blog.coursera.org/from-start-to-finish-how-early-course-design-can-drive-online-learner-completion) | D–F | Videos under 10 minutes, 3 to 6 minutes each in the first week, one in-video question per 8 to 10 minutes, each answerable in seconds by someone who was watching. | Short pieces with a question inside keep a self-paced viewer active; these are the only platform-published numbers found. |
 
 ## Written guide
 
@@ -57,8 +64,9 @@ Teaching that has held up. For each: the mechanic to learn and one line on why i
 
 | Shape | Mechanic to learn | Where it goes in a plan |
 |---|---|---|
-| The story spine (improv exercise, widely known through Pixar's story advice) | A settled world, a disruption, a chain of "because of that", a resolution, and what is different now. | Hook shows the settled world and the disruption; try and apply are the chain; reward shows what is different. |
+| The story spine (Kenn Adams's improv exercise, widely known through Pixar's story advice; [NPR](https://www.npr.org/transcripts/nx-s1-5750619)) | A settled world, a disruption, a chain of "because of that", a resolution, and what is different now. | Hook shows the settled world and the disruption; try and apply are the chain; reward shows what is different. |
 | The guide character | A recurring character who is competent but gets one thing wrong at the start of each lesson, and is corrected by the learner's work. | Story frame; the correction is the callback in reward. |
+| Meyer's three acts ([post](https://blog.mrmeyer.com/2011/the-three-acts-of-a-mathematical-story/)) | A wordless conflict, the struggle to build the tools, a resolution that pays off the opening. Adds two tests the spine lacks: the hook needs almost no words, and the reveal is shown against the learner's own guess. | Hook is act one; try and apply are act two; the reward or check shows act three against the guess. |
 
 ## Counter-examples
 
@@ -67,6 +75,7 @@ Teaching that has held up. For each: the mechanic to learn and one line on why i
 | IKEA manuals | Text-free steps that are followed wrong when the drawing cannot settle a question: mirrored parts, near-identical fasteners, which way is up. | Wordless works only when the picture answers every question the step raises. When it cannot, add one line of text, not a paragraph. |
 | The recorded lecture posted as "video" | A camera pointed at a talk; no pause points, no visual that the voice is not already saying. | Video mode is a different lesson, not a recording of the live one. |
 | The quiz show in a classroom | One learner answers, the rest watch; the fastest hand wins. | Every mechanic has to involve every learner, or it is a performance. |
+| The clear, confident explainer video | Viewers rate it highly and keep their misconception, because nothing in it says the wrong idea out loud ([Muller](https://openjournals.library.sydney.edu.au/IISME/article/view/6345)). | Smooth is not the target. Voice the wrong belief, then take it apart. |
 
 ## The test a plan must pass
 

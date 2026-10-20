@@ -14,6 +14,9 @@ Each item below, present in the plan without a reason written in the brief, is a
 - Homework that is more of the worksheet, with no own-material step.
 - Segments all the same length regardless of beat.
 - A "break" that is the only place the active ratio is met.
+- A hook question that is never answered later in the lesson.
+- Questions answered only by hands up or a volunteer while everyone else watches.
+- An explanation that never says the common wrong belief out loud, when the topic has one.
 
 ## Text
 
@@ -38,6 +41,14 @@ Each item below, present in the plan without a reason written in the brief, is a
 - A quiz-show format where one person answers and thirty watch.
 - A streak that punishes a missed day in a course that meets weekly.
 - A reward that is a picture of a trophy.
+- An expected, tangible reward for doing or finishing: "finish and you get a sticker", "complete the module, get a voucher".
+- A leaderboard or ranking with no supportive individual feedback, or with nothing said about what the learner at the bottom sees.
+- Mandatory badges plus a public leaderboard.
+- A streak that resets to zero and says "you lost your streak".
+- "Play a Kahoot" (or any quiz tool) with no mode named: team or individual, speed or accuracy, named or anonymous.
+- Mechanics aimed at Bartle player types ("a duel for the Killers").
+- A choice that pays points ("pick your path, earn 10 XP").
+- A game layer in a multi-week course that never changes after week 1.
 
 ## Humour
 
@@ -50,6 +61,18 @@ Each item below, present in the plan without a reason written in the brief, is a
 - "Fellow kids" slang in a plan for band C or D.
 - A joke in a check segment, a safety step or a consent moment.
 - A laugh pause written into the script.
+- A warm-up or mood-change joke unrelated to the content (the 분위기 전환 line before the lesson starts).
+- A narrator who says more than once that they are bad at the thing they are teaching.
+- A sarcastic narrator in band A or B.
+- 아재개그 in band C or older, or a pun that is not on the content word.
+
+## Story
+
+- A mascot that only announces segments: it never reacts, never needs help, and could be deleted.
+- A frame that is only a setting: no disruption ("but one day") and no resolution ("until finally").
+- The story as a wrapper, with the concept in a bullet list beside it.
+- A scenario whose only feedback is "correct" or "wrong".
+- An anecdote or image that is interesting but only near the concept.
 
 ## Visuals
 
@@ -91,3 +114,7 @@ Each item below, present in the plan without a reason written in the brief, is a
 - A leaderboard that is opt-in, for band D or above, when the brief asks for it.
 - Repetition in band A: it is the mechanic, not a tell.
 - A plain plan when the brief's register is plain. Restraint is a choice when the brief makes it.
+- One low-bar "you tried" badge on the first try segment only, for B–C, when the brief says the learners are low in confidence; every later badge is tied to evidence.
+- A one-off lesson whose game layer never changes: novelty is on its side.
+- One narrator line about their own slip with a tool.
+- A cap or ratio missed by a little with no other harm: a house-default breach, severity 2 at most in the critic, never a slop tell on its own.

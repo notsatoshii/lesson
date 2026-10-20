@@ -46,3 +46,7 @@ The orchestrator writes these at the end of the run (step 4, Report), not mid-cy
 - Critics 05 (engagement) and 06 (story) quote the owner's Standing rules and Dislikes in findings where they apply, and name the owner's Closest references when they score the taste bar.
 - Critics 02–09 and the editor read Likes, Dislikes and Standing rules before judging or writing anything new.
 - Nothing in the file overrides the brief's outcome, the age band or the house rules. Where they conflict, the brief wins for that lesson and the critic says so in one line.
+
+## Labels on findings
+
+The owner's verdicts on individual findings (valid, invalid, wrong severity) are not taste and do not go in this file. They go to `evals/calibration.json` by the format in `taste/calibration.md`, and they measure the critics rather than steer them.

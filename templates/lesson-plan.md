@@ -8,6 +8,19 @@ By the end, each learner **can** <one verb phrase, observable> and **has made** 
 
 Prior knowledge assumed: <list, or "none">. Prerequisite check: <the 30-second check at the start that confirms it>.
 
+### Success criteria
+
+What "good" looks like, shown to learners before they attempt the task, never only after.
+
+- criteria: <two to four lines a learner can check their own work against; the same lines the check and the assignment use>
+- model answer or work sample: <the finished example, or where it lives (a media id, a file)>; for skills with grades of quality, a weak and a strong sample side by side
+- shown in: <segment id, before the first try or apply>
+
+### Expect effort
+
+- line: "<the sentence, in the house-rule language, that tells learners practice will feel harder than listening and that the first question is meant to be hard>"
+- said in: <segment id, before the first try or pre-question>
+
 ## Story frame
 
 - setting: <where the lesson "takes place" or the running scenario>
@@ -41,22 +54,50 @@ Timing rule: segments sum to total minus a buffer (live: 10 %, online: none, vid
 
 ### Segment detail
 
-For each segment: the exact instruction the learner hears or reads (in the house-rule language and register), the materials, the teacher's or app's move when a learner is fast / slow / wrong, and the transition line into the next segment.
+For each segment: the exact instruction the learner hears or reads (in the house-rule language and register), the materials, what to prepare and what usually goes wrong (the 자료 및 유의점 line of a Korean 교수·학습 과정안), the teacher's or app's move when a learner is fast / slow / wrong, and the transition line into the next segment.
 
 #### S1 <title>
 - instruction: "<…>"
+- expected: "<what the learner sees when it worked; required in guide mode and for every install or setup step>"
 - materials: <…>
+- prepare / what goes wrong: <what must be ready before the segment starts> / <the one thing that most often breaks here, and the move that saves it>
 - fast / slow / wrong: <…> / <…> / <…>
 - transition: "<…>"
 
+Check and retrieval segments also carry their items, which every learner answers and `tools/quiz_export.py` exports:
+
+```
+- check items:
+  Q: <question>
+  A: <correct answer>
+  W: <wrong option> (misconception: <the wrong belief this option catches>)
+  F: <feedback that says what to do next>
+```
+
 (repeat per segment)
+
+## Misconceptions
+
+The two or three wrong ideas learners most often bring. Each is voiced before the explanation that fixes it, not only corrected afterwards.
+
+| misconception | surfaces in | how it is voiced first | the line that fixes it |
+|---|---|---|---|
+| <the wrong belief, as a learner would say it> | S? | <prediction, hinge question, or the narrator saying it out loud> | "<…>" |
+
+## Check-result branch
+
+What happens with the check's result. A check whose result changes nothing is decoration.
+
+- weak result (<threshold, e.g. fewer than 2 of 3 criteria met>): <reteach move in this lesson, or the next lesson's opener, named>
+- strong result (<threshold>): <extension on the same artifact>
+- recorded where: <the sheet, the app field, the teacher's list>
 
 ## Assignment (the practical)
 
 - task: <what they make or do on their own material after the lesson; usable the next day>
 - uses: <where this artifact is used again in the course, or in their life>
 - deliverable: <the file, photo, link or demonstration>
-- check: <checklist or rubric lines the learner can self-run, plus the one line the teacher or app checks>
+- check: <the Success criteria lines the learner can self-run, plus the one line the teacher or app checks>
 - time: <N> min · optional stretch: <…>
 
 ## Materials
@@ -83,7 +124,7 @@ reading level: <per age band> · captions on video: yes · colour never the only
 ## Teacher / app notes
 
 - timing buffers: <…>
-- common misconceptions and the line that fixes each: <…>
+- misconceptions: see the Misconceptions table
 - what to cut first if running late: <segment id>
 - what to add if early: <stretch task>
 
