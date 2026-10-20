@@ -77,7 +77,7 @@ Spawn one subagent per active critic in a single message.
 
 ### 3.3 Merge
 
-1. Read every `critic-NN.json` and the gate's severity-1 lint findings.
+1. Run `tools/merge.py history/cycle-N --gate history/cycle-N/gate.json --out history/cycle-N/merged.json --md history/cycle-N/merged.md`: it reads every `critic-NN.json` (tolerating a code fence), rejects files without checks, an anchor, a weakest entry or located findings (re-run those critics once), adds the gate's severity-1 lint lines, maps the blind pair back, gives ids, ranks, and lists candidate duplicates. Steps 2–4 below are what it does; the orchestrator still merges duplicates by judgement and does steps 5–8.
 2. Map each blind comparison back with `map.json`. Per critic: `better` when both reads of the outcome question pick the current plan and the house-rules question does not pick the previous one in both reads; `worse` when both reads of either question pick the previous plan; otherwise `same`.
 3. Dedupe by location + issue. Keep the owner's wording (ownership table in `00-shared.md`) and count every critic that raised it as a vote. Give every finding an id `c<N>-<NN>-<k>` (cycle, critic number, the finding's 1-based position in that critic's JSON); a merged finding lists every id it came from. The ids go on each finding line in the cycle report so the owner can label findings later (`taste/calibration.md`).
 4. Rank: severity 1 → 2 → 3. Within a severity, more votes first, then the lower-numbered critic.

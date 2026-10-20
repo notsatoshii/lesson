@@ -17,6 +17,8 @@ Scripts the loop, the critics and the editor use for evidence and for producing 
 |---|---|---|
 | `taste_digest.py --band B --mode M --out docs/lessons/<slug>/taste-digest.md [--owner f] [--project taste.md]` | the orchestrator at intake; every critic reads it | the owner's file whole plus the band's and mode's parts of `taste/` (band tables cut to one row) → one file, about two thirds the size of the six it replaces. Stdlib only. |
 
+| `merge.py <history/cycle-N> [--gate gate.json] [--out merged.json] [--md merged.md]` | the orchestrator after the critics | every `critic-NN.json` (a code fence tolerated) → validated, blind pair mapped back, ids `c<N>-<NN>-<k>`, ranked, candidate duplicates listed; exit 1 when a critic file is invalid. Stdlib only. |
+
 ## Media
 
 | script | used by | input → output |

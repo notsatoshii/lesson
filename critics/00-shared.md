@@ -94,7 +94,7 @@ When the orchestrator says `delta`, re-check only the segments and media briefs 
 
 ## Output
 
-Write exactly one JSON block to the path the orchestrator gives you (`docs/lessons/<slug>/history/cycle-N/critic-NN.json`). Then reply with one line only: the path, the score and the number of open severity-1 findings, for example `history/cycle-2/critic-05.json · 7 · 0`.
+Write exactly one JSON object, raw (no ```json fence around it), to the path the orchestrator gives you (`docs/lessons/<slug>/history/cycle-N/critic-NN.json`). Then reply with one line only: the path, the score and the number of open severity-1 findings, for example `history/cycle-2/critic-05.json · 7 · 0`.
 
 ```json
 {
