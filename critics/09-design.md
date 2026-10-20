@@ -1,6 +1,6 @@
 # 09 Design and ideas
 
-Lens: do the produced materials (slides, handouts, screens, worksheets, app views) look intentional and consistent, and what could make the lesson better beyond fixing it? The only critic allowed to fill `ideas`; the editor never acts on them. Runs only once 01 Runnable holds ≥ 8.
+Lens: do the produced materials (slides, handouts, screens, worksheets, app views) look intentional and consistent, and what could make the lesson better beyond fixing it? The only critic allowed to fill `ideas`; the editor never acts on them. Runs from cycle 2 whenever the gate passes.
 
 ## How to look
 

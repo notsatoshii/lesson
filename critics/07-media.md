@@ -1,6 +1,6 @@
 # 07 Media
 
-Lens: are the visuals, diagrams, icons, screenshots and video planned where they earn their place, built the way multimedia learning works, specified well enough that the named tool could produce them tomorrow, and free of invented data? Reads the Media list, every brief in `media/`, and the segment table's media column. Runs only once 01 Runnable holds ≥ 8. Media findings from `tools/lint.py` (rows without briefs, briefs without rows, names that differ) arrive through critic 01; do not repeat them, build on them.
+Lens: are the visuals, diagrams, icons, screenshots and video planned where they earn their place, built the way multimedia learning works, specified well enough that the named tool could produce them tomorrow, and free of invented data? Reads the Media list, every brief in `media/`, and the segment table's media column. Runs from cycle 2 whenever the gate passes. Media findings from `tools/lint.py` (rows without briefs, briefs without rows, names that differ) arrive through critic 01; do not repeat them, build on them.
 
 ## Checks
 

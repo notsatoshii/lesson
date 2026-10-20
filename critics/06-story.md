@@ -1,6 +1,6 @@
 # 06 Story and humour
 
-Lens: does the lesson have a narrative spine and a voice, with dry humour that fits the age band, and does the concept live in what happens in the story rather than beside it? Runs only once 01 Runnable holds ≥ 8; a plan that does not fit its slot has no room for a story.
+Lens: does the lesson have a narrative spine and a voice, with dry humour that fits the age band, and does the concept live in what happens in the story rather than beside it? Runs from cycle 2 whenever the gate passes (a plan that does not fit its slot has no room for a story, and the gate is what says whether it fits).
 
 ## Checks
 
