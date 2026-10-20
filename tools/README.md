@@ -28,6 +28,7 @@ Scripts the loop, the critics and the editor use for evidence and for producing 
 | `icons.py fetch <family> <name>... [--color] [--size 48] [--out dir] [--lesson plan.md] [--switch]` | the editor for icon sets | Iconify icons → SVG plus PNG at 2x, cached offline; one family per lesson, recorded in the plan header. resvg-py, or Chrome. |
 | `diagram/render.py <file.mmd\|brief.md> --out x.png [--block 1] [--scale 2] [--landscape]` | the editor for diagram briefs | a Mermaid block → PNG at 2x with the house theme and a Korean font; warns over 7 boxes, on left-to-right flowcharts (top-down ones with `--landscape`, for a projected 16:9 slide, where a tall chain shrinks to unreadable) and on SVG output. mermaid-cli. |
 | `guide.py <plan.md> --out guide.pdf [--png-dir dir] [--handout [file.pdf]] [--steps S1,S2]` | guide mode | a guide plan plus its `.hl.png` shots → a Marp step deck (PDF and phone PNGs) and a printable Typst handout; gaps become visible `[needs …]` placeholders. marp-cli, Typst. |
+| `worksheet.py <data.json> --out x.pdf [--png] [--ppi 144]` | the editor for printable handout, worksheet and card briefs | a JSON sheet (header band, text, ruled table, checklist, fill-in fields, numbered strip, columns, panel, oval, writing lines, cut line, page break) → an A4 PDF through `templates/worksheet.typ`, one PNG per page, and a fit check that exits 2 when the sheet runs past its `pages` value. Typst. |
 | `narrate.py <brief.md\|script.txt> --out <dir> [--voice ko-KR-SunHiNeural] [--engine edge\|google\|elevenlabs]` | video and animation briefs | the storyboard's voice column → one MP3 per row, a joined MP3, an SRT taken from the script (never speech recognition) and a manifest. edge-tts for drafts. |
 | `quiz_export.py <plan.md> [--kahoot out.xlsx] [--forms out.json] [--anki out.txt] [--list]` | quiz briefs, the owner after a run | the plan's Q/A/W check items → Kahoot import sheet (95/60 character limits), Google Forms quiz body, Anki import file. openpyxl. |
 | `video/storyboard.py <brief.md> --out x.mp4 [--audio <dir>] [--size phone\|landscape\|WxH] [--engine auto\|revideo\|ffmpeg]` | video briefs, critic 07 | the storyboard table → a captioned MP4 (1080x1920 by default) timed by the t column or by `narrate.py` MP3s. Revideo (MIT) with the installed Chrome; ffmpeg fallback. `npm install` in `tools/video` first. |
@@ -94,6 +95,19 @@ Families: lucide, ph (phosphor), tabler, heroicons, iconoir, material-symbols, r
 ## guide.py and templates/handout.typ
 
 Each Segments-table row becomes one step: the `- instruction:` line is the headline, the `- expected:` line is the result line, and the step's media `.hl.png` is the picture (found from the brief, then `media/<id>.hl.png` and its variants). A missing instruction or image becomes a visible placeholder and a warning; the tool never stops on a gap. The deck is an editable Marp file plus a 720x1280 portrait theme, rendered to PDF and, with `--png-dir`, one 1080x1920 PNG per slide. `--handout` fills `templates/handout.typ` (A4, `lang: "ko"`, a screenshot, badge, instruction, result line and writing lines per step) and compiles it with Typst.
+
+## worksheet.py and templates/worksheet.typ
+
+A printable sheet as data. The JSON names `title`, `footer` (a small grey line, such as the material id), `pages` (the page count it must fit; the A4 fit check), `paper` (`a4`), `flipped`, `margin` (mm, a number or `{x, top, bottom}`), `size` (body pt, 11), `gap` (mm between blocks, 3.5), `colors` (`ink` #221F38, `accent` #D93D22, `paper`, `grey_fill`, `muted`, `rule`), `icons` (`{"brain": "icons/brain.svg"}`, paths relative to the JSON; stroke icons are recoloured on the fly) and `blocks`:
+
+- `header` (title, meta, optional `fields` such as 이름 / 날짜 as write-on lines), `text` (`body`, or `lines` for several paragraphs; `fill`, `stroke`, `size`, `bold`, `color`)
+- `table`: `columns` (`head`, `width` in mm or `"1fr"`, `align`, `number: true` for an auto row number), `prefill` rows, then `rows` empty rows at `row_height` (8 mm by default; anything under 7 mm is raised to 7 and reported)
+- `checklist` (tick boxes), `fields` (labelled write-on lines, boxed fields, tally `boxes`, multi-line `lines`), `strip` (①[ ] → ②[ ] …, empty or with `items`), `oval`, `lines`, `cut`, `space`
+- `columns` (`widths`, `cols`: a block list each) and `panel` (`title`, `blocks`, `fill`, `stroke`, `height`) nest other blocks; `pagebreak` starts the next page, so a front and a back are one JSON
+
+Text is a string or a list of runs: `{"text", "bold", "color", "size", "strike"}`, `{"blank": mm}`, `{"field": mm}`, `{"box": true}`, `{"tag": "3"}` (a value in an outlined box, to circle), `{"mark": "P"|"T"}` (the 처리 / 판단 chip: outline + word + repeat icon, filled accent + word + brain icon, so colour never carries the meaning alone), `{"icon": name}`, `{"sp": mm}`, `{"br": true}`. Strings are printed as plain text, never as Typst markup, and Hangul breaks only at spaces (word-break: keep-all). Keys starting with `_` are ignored, so a JSON can carry its brief, its `[needs fact]` notes or a block held back until a fact arrives.
+
+`worksheet.py` compiles with `typst compile --root` set to the folder shared by the template and the JSON, writes `<out>-1.png`, `<out>-2.png` … with `--png` (144 ppi, 2x), then reads the page count back with `typst query` and warns (exit 2) when the sheet runs to more pages than `pages`. Look at every PNG anyway: the fit check catches overflow onto a new page, not a cramped row.
 
 ## narrate.py
 
