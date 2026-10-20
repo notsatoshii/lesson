@@ -1,0 +1,16 @@
+/* House theme for mermaid-cli (passed with --cssFile, inlined as themeCSS).
+   White card, large type, one accent (#FF4D2E, the same as highlight.py). */
+svg { background: #FFFFFF; }
+.node rect, .node polygon, .node circle, .node ellipse, .node path { stroke-width: 2px; }
+.node rect { rx: 10px; ry: 10px; }
+.nodeLabel, .edgeLabel, .label { font-family: "Malgun Gothic", "Noto Sans KR", sans-serif; word-break: keep-all; line-height: 1.35; }
+.nodeLabel { font-weight: 600; }
+.edgeLabel { font-size: 17px; color: #4B5563; }
+.flowchart-link { stroke-width: 2px; }
+.cluster rect { rx: 12px; ry: 12px; stroke-dasharray: 0; }
+.cluster-label .nodeLabel { font-weight: 700; color: #4B5563; }
+/* A:::accent marks the one box the learner should look at first. */
+.node.accent rect, .node.accent polygon, .node.accent circle, .node.accent path { fill: #FFF1EE !important; stroke: #FF4D2E !important; stroke-width: 3px; }
+/* A:::muted for context boxes. */
+.node.muted rect, .node.muted polygon { fill: #F3F4F6 !important; stroke: #9CA3AF !important; }
+.node.muted .nodeLabel { color: #4B5563; font-weight: 500; }

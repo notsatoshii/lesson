@@ -1,0 +1,49 @@
+{
+  "theme": "base",
+  "fontFamily": "Malgun Gothic, Noto Sans KR, sans-serif",
+  "themeVariables": {
+    "fontFamily": "Malgun Gothic, Noto Sans KR, sans-serif",
+    "fontSize": "20px",
+    "background": "#FFFFFF",
+    "primaryColor": "#FFFFFF",
+    "primaryBorderColor": "#2B2F36",
+    "primaryTextColor": "#1A1D21",
+    "secondaryColor": "#F3F4F6",
+    "secondaryBorderColor": "#9CA3AF",
+    "secondaryTextColor": "#1A1D21",
+    "tertiaryColor": "#FFF1EE",
+    "tertiaryBorderColor": "#FF4D2E",
+    "tertiaryTextColor": "#1A1D21",
+    "lineColor": "#4B5563",
+    "textColor": "#1A1D21",
+    "mainBkg": "#FFFFFF",
+    "nodeBorder": "#2B2F36",
+    "clusterBkg": "#F7F7F8",
+    "clusterBorder": "#D1D5DB",
+    "edgeLabelBackground": "#FFFFFF",
+    "noteBkgColor": "#FFF8E6",
+    "noteBorderColor": "#E0B84C",
+    "noteTextColor": "#1A1D21",
+    "actorBkg": "#FFFFFF",
+    "actorBorder": "#2B2F36",
+    "signalColor": "#4B5563",
+    "signalTextColor": "#1A1D21"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis",
+    "nodeSpacing": 40,
+    "rankSpacing": 56,
+    "padding": 18,
+    "diagramPadding": 24,
+    "useMaxWidth": false,
+    "wrappingWidth": 240
+  },
+  "sequence": {
+    "useMaxWidth": false,
+    "mirrorActors": false,
+    "actorFontFamily": "Malgun Gothic, Noto Sans KR, sans-serif",
+    "messageFontFamily": "Malgun Gothic, Noto Sans KR, sans-serif",
+    "noteFontFamily": "Malgun Gothic, Noto Sans KR, sans-serif"
+  }
+}

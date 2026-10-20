@@ -1,0 +1,19 @@
+/* @theme lesson-guide */
+/* One step per slide, phone portrait. Korean first; keep-all stops mid-word line breaks. */
+section {
+  width: 720px; height: 1280px; box-sizing: border-box; padding: 56px 48px 48px;
+  background: #FFFFFF; color: #1A1D21;
+  font-family: "Malgun Gothic", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  word-break: keep-all; overflow-wrap: break-word; line-height: 1.4;
+  display: flex; flex-direction: column; justify-content: flex-start; gap: 22px;
+}
+section .num { font-size: 22px; font-weight: 700; color: #FF4D2E; letter-spacing: 0.02em; }
+section h1 { font-size: 52px; line-height: 1.25; margin: 0; }
+section h2 { font-size: 40px; line-height: 1.3; margin: 0; font-weight: 800; }
+section .shot { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+section .shot img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 18px;
+  border: 1px solid #D9DCE1; box-shadow: 0 6px 24px rgba(26,29,33,0.10); }
+section .missing { border: 3px dashed #C4C8CF; border-radius: 18px; padding: 40px; color: #6B7280; font-size: 26px; text-align: center; }
+section .expect { font-size: 28px; background: #EEF7F1; color: #17633A; border-radius: 14px; padding: 18px 22px; }
+section.title { justify-content: center; }
+section.title .meta { font-size: 26px; color: #6B7280; }

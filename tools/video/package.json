@@ -1,0 +1,20 @@
+{
+  "name": "lesson-video",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Storyboard table in a media brief -> captioned MP4 (Revideo, MIT).",
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "@revideo/2d": "0.11.0",
+    "@revideo/core": "0.11.0",
+    "@revideo/renderer": "0.11.0",
+    "@revideo/ui": "0.11.0",
+    "@revideo/vite-plugin": "0.11.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
