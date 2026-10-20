@@ -39,7 +39,7 @@ You are the only writer in this cycle. You get the ranked findings, the decision
 
 ## Report
 
-Return, for each finding:
+Return, for each finding, one row of a table with exactly these columns, so the orchestrator can build next cycle's closure checklists from it: `| # | id(s) | sev | status | what changed | where the new text is |`. Per row:
 
 - status: `fixed` / `partly` (what remains) / `skipped` (why, in one line) / `conflict` (with what, which rule settled it)
 - what changed, in one line

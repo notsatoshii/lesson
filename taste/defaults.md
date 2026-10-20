@@ -94,9 +94,9 @@ Never: points for attendance, XP for self-reported anything, rewards promised in
 
 ## Loop budget
 
-- **Token cap: 2M tokens per run** (one `/lesson` invocation, all cycles and critics included) when the house rules and the brief set none. The house rules' token budget, when present, replaces it.
+- **Token cap: 8M tokens per run** (one `/lesson` invocation, all cycles and critics included) when the house rules and the brief set none, so the default 4-cycle cap is what stops a run, not the budget. The house rules' token budget, when present, replaces it.
 - Reaching the cap stops the loop with `stop: cap` at the end of the current cycle; the best-so-far plan is the one kept, and the cycle report header shows `tokens: cycle / total / cap`.
-- Like the other numbers here, the cap is a house default, not a measured limit. One measurement (first real run, 2026-10-20, a 120-minute live plan of about 9,500 words with seven media briefs): 150k–190k tokens per critic as the host counts them, 320k for the editor, so one full cycle of nine critics and the editor costs about 1.8M. A cap under 2M on a plan that size leaves room for one full cycle; scale the cap with the plan, or narrow the panel with `--only`.
+- Like the other numbers here, the cap is a house default, not a measured limit. One measurement (first real run, 2026-10-20, a 120-minute live plan of about 9,500 words with seven media briefs): 150k–190k tokens per critic as the host counts them, 320k for the editor, so one full cycle of nine critics and the editor costs about 1.8M; the same run's four cycles together cost 5.95M (cycles 3 and 4: about 1.7M of critics each, 0.25M of editor). Delta mode saved nothing there (a delta critic still reads the blind pair and the snapshot, three copies of the plan). Four full cycles on a plan that size need about 7.5M; scale the cap with the plan, or narrow the panel with `--only`.
 
 ## Media
 
