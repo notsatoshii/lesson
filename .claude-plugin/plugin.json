@@ -1,0 +1,9 @@
+{
+  "name": "lesson",
+  "version": "0.2.0",
+  "description": "Autonomous lesson-design loop: interview, draft, nine critics, one editor, until the lesson clears the bar",
+  "author": { "name": "notsatoshii" },
+  "license": "MIT",
+  "repository": "https://github.com/notsatoshii/lesson",
+  "skills": ["./"]
+}

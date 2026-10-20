@@ -1,0 +1,5 @@
+---
+# The loop wrote the cycle report for cycle 1.
+type: file_exists
+path: docs/lessons/eval-control-clean/cycle-1.md
+---

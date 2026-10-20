@@ -1,0 +1,22 @@
+[
+  {"query": "/lesson docs/lessons/mail-triage-1/plan.md", "should_trigger": true},
+  {"query": "can you review this lesson plan and make it less boring? it's for 30 office workers, 50 minutes: docs/onboarding/lesson2.md", "should_trigger": true},
+  {"query": "I need a 45 minute workshop on writing good meeting notes for new hires. plan it end to end and keep improving it until it's solid", "should_trigger": true},
+  {"query": "이 수업안 좀 봐 주세요. 초등학생 대상 40분 수업인데 아이들이 중간에 집중을 못 해요. 재밌게 고쳐 주세요", "should_trigger": true},
+  {"query": "make this lesson fun, it's a self-paced phone lesson on setting up two-factor login for seniors", "should_trigger": true},
+  {"query": "plan a 6-lesson course for teenagers on spotting fake news, each lesson 50 min, they should leave with something they made", "should_trigger": true},
+  {"query": "직장인 대상 AI 활용 첫 수업 과정안을 처음부터 짜 주세요. 인터뷰부터 해서 끝까지 알아서 돌려 주시면 됩니다", "should_trigger": true},
+  {"query": "here's my talk outline for a 20 min session at the team offsite, turn it into a proper lesson with an activity and loop on it", "should_trigger": true},
+  {"query": "run the lesson loop on everything in docs/curriculum/online/ as a course", "should_trigger": true},
+  {"query": "the guide for installing the VPN client reads like a manual, can you redesign it as a step by step lesson with screenshots planned and keep critiquing it", "should_trigger": true},
+  {"query": "translate this lesson plan into English, keep the tone", "should_trigger": false},
+  {"query": "write me a cover letter for a teaching assistant job", "should_trigger": false},
+  {"query": "the landing page for our course looks generic, run the design loop on it", "should_trigger": false},
+  {"query": "summarise the report in reports/Improving the lesson skill.md in five bullets", "should_trigger": false},
+  {"query": "fix the failing test in tools/test_timing.py", "should_trigger": false},
+  {"query": "make 10 kahoot questions about the French revolution", "should_trigger": false},
+  {"query": "what did I learn this week? give me a quick recap of my notes", "should_trigger": false},
+  {"query": "수업 홍보용 인스타그램 문구 세 개만 써 주세요", "should_trigger": false},
+  {"query": "grill me on my plan to switch our team from weekly to biweekly sprints", "should_trigger": false},
+  {"query": "turn these slides into a pptx deck with our brand colours", "should_trigger": false}
+]

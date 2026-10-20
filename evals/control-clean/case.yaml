@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: control-clean
+context:
+  # Copies workspace/ (plan, brief, media briefs, lesson.md) into the run's empty workspace.
+  # Generated from workspace/ by evals/check_fixtures.py --build; runs only with --scaffold.
+  scaffold_script: scaffold.sh

@@ -1,0 +1,60 @@
+{
+ "schema": "lesson-calibration/1",
+ "about": "Owner labels on real critic findings. Ground truth for per-critic precision (evals/calibrate.py report). Format and routine: taste/calibration.md. The two entries below are examples, marked example: true, and are ignored by the report.",
+ "threshold": 0.8,
+ "min_labels": 5,
+ "label_line": "<slug>/c<cycle>-<critic NN>-<k> valid | invalid[: note] | sev <1|2|3>[: note]",
+ "entry_fields": {
+  "id": "<slug>/c<cycle>-<critic NN>-<k>; k is the 1-based position in history/cycle-<cycle>/critic-<NN>.json findings",
+  "lesson": "slug",
+  "cycle": "cycle number",
+  "critic": "critic id, e.g. 05-engagement",
+  "index": "k",
+  "severity": "severity the critic gave (1-3), null when the finding file was not found",
+  "location": "the finding's location",
+  "issue": "the finding's issue sentence",
+  "label": "valid | invalid | wrong-severity",
+  "correct_severity": "the owner's severity when label is wrong-severity, else null",
+  "note": "optional one-line reason",
+  "labelled": "YYYY-MM-DD",
+  "rubric": "short git hash of the critic's rubric file when labelled",
+  "model": "model that ran the critics, when known",
+  "example": "true only for the starter examples"
+ },
+ "entries": [
+  {
+   "id": "example-lesson/c1-05-02",
+   "lesson": "example-lesson",
+   "cycle": 1,
+   "critic": "05-engagement",
+   "index": 2,
+   "severity": 1,
+   "location": "S3",
+   "issue": "EXAMPLE: the try segment has a 30-second timer on a judgement question.",
+   "label": "valid",
+   "correct_severity": null,
+   "note": "EXAMPLE entry, not a real label",
+   "labelled": "2026-10-20",
+   "rubric": "",
+   "model": "",
+   "example": true
+  },
+  {
+   "id": "example-lesson/c1-08-04",
+   "lesson": "example-lesson",
+   "cycle": 1,
+   "critic": "08-clarity",
+   "index": 4,
+   "severity": 1,
+   "location": "S2",
+   "issue": "EXAMPLE: the explanation sentence runs 18 어절.",
+   "label": "wrong-severity",
+   "correct_severity": 3,
+   "note": "EXAMPLE entry, not a real label: a long sentence is polish here, not a blocker",
+   "labelled": "2026-10-20",
+   "rubric": "",
+   "model": "",
+   "example": true
+  }
+ ]
+}

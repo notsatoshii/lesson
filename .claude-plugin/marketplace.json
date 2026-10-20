@@ -1,0 +1,14 @@
+{
+  "name": "lesson",
+  "description": "The lesson skill: an autonomous lesson-design loop for Claude Code",
+  "owner": {
+    "name": "notsatoshii"
+  },
+  "plugins": [
+    {
+      "name": "lesson",
+      "source": "./",
+      "description": "Autonomous lesson-design loop: interview, draft, nine critics, one editor, until the lesson clears the bar"
+    }
+  ]
+}
