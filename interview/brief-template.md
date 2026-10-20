@@ -1,6 +1,6 @@
 # Brief: <lesson title>
 
-slug: <slug> · mode: <live|online|video|guide|talk> · kind: <new|existing> · written: <YYYY-MM-DD> · bar: <N> · cycles: <N>
+slug: <slug> · mode: <live|online|video|guide|talk> · kind: <new|existing> · written: <YYYY-MM-DD> · bar: <N> · cycles: <N, default 4> · token cap: <N>
 
 ## Who
 age band: <A–G> · group: <size> · setting: <room, app, home> · prior knowledge: <…> · why they are here: <chose | sent | school>
@@ -33,7 +33,11 @@ language: <…> · register: <…> · reading level: <band default | override> �
 exists: <…> · may be generated: <diagrams, highlighted screenshots, storyboards, icons> · needs a human: <…> · design system to follow: <path or "skill defaults">
 
 ## Facts
-may never be invented: <curriculum claims, tool behaviour, numbers, …> · sources: <paths or "ask the user">
+may never be invented: <curriculum claims, tool behaviour, numbers, …> · sources: <paths in the project>
+
+Fact gate (written before the first draft; every fact the plan will need):
+- sourced: <fact> ← <path>
+- needs fact: <what> · where it would come from: <file or person> · how the plan works without it: <the learner's own material | a marked placeholder in S?>
 
 ## Devices and access
 learners have: <…> · may lack: <…> · alternative for those who lack: <…>
@@ -50,5 +54,8 @@ during: <…> · at the end: <…> · later: <…>
 ## What is wrong today (existing plans, the user's words)
 <…>
 
-## Definition of done (approved by the user on <date>)
-<who · outcome and artifact · mode and minutes · story frame · game layer · humour limits · must-not-change · facts rule · bar>
+## Definition of done (read back to the user on <date>)
+<who · outcome and artifact · mode and minutes · story frame · game layer · humour limits · must-not-change · facts rule and needs-fact list · bar · cycle cap>
+
+## Answers the loop filled in
+<questions the user skipped or `--skip-interview` left open: question · recommended answer used · logged as a decision the loop made>

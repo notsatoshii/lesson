@@ -1,0 +1,15 @@
+# research inputs and run outputs stay local
+research_notes/
+reports/
+docs/lessons/
+
+# media toolchain build output
+tools/video/node_modules/
+tools/video/output/
+__pycache__/
+
+# highlighted screenshots are generated; keep only the ones in an examples folder
+*.hl.png
+!**/examples/**/*.hl.png
+tools/.cache/
+tools/interactive/bin/
