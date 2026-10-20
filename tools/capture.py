@@ -265,6 +265,8 @@ def main():
     hl = None
     if a.highlight:
         cmd = [sys.executable, str(HERE / "highlight.py"), str(out)]
+        if a.dpr and a.dpr != 1:  # a 2x shot needs 2x strokes, badges and labels or they look thin
+            cmd += ["--size", f"{a.dpr:g}"]
         if a.brief:
             cmd += ["--spec", a.brief]
         else:
