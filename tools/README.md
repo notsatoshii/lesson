@@ -9,7 +9,7 @@ Scripts the loop, the critics and the editor use for evidence and for producing 
 | `timing.py <plan.md> [--mode live\|online\|video\|guide\|talk] [--band A..G] [--json]` | critic 01, critic 04, the gate | a lesson plan → minutes vs total and buffer, active vs passive, longest passive stretch and longest segment against the band caps, beats, channels. Exit 1 when a check fails. Stdlib only. |
 | `lint.py <plan.md> [--house <lesson.md>] [--band A..G] [--json]` | the gate; sev-1 findings go to critic 01 | a plan plus the briefs in `media/` beside it → findings with severity, location, rule, issue and fix, plus stats. Exit 1 on any severity-1 finding. Stdlib only. |
 
-The loop saves both outputs to `history/cycle-N/gate.json`, passes `--house` when the project has a `lesson.md`, and runs a short cycle (critic 01 and the editor) when either fails.
+`gate.py <plan.md> --out <history/cycle-N/gate.json> [--mode] [--band] [--house]` runs both with UTF-8 forced on the pipe (Korean otherwise breaks on Windows), saves `gate.json` with each tool's exit code and run time, prints a three-line summary and exits 1 when the cycle must be short. The loop saves both outputs to `history/cycle-N/gate.json`, passes `--house` when the project has a `lesson.md`, and runs a short cycle (critic 01 and the editor) when either fails.
 
 ## Media
 

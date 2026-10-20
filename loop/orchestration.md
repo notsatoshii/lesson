@@ -45,10 +45,7 @@ Cycle N runs: gate → critics → merge → decide → editor. Every stop is de
 ### 3.1 Gate and snapshot
 
 1. Snapshot: copy the plan and media briefs to `docs/lessons/<slug>/history/cycle-N/`.
-2. Run the gate on the snapshot, and time it:
-   - `tools/timing.py <plan.md> --mode <mode> --band <band> --json`
-   - `tools/lint.py <plan.md> --house <lesson.md> --band <band> --json` (omit `--house` when the project has no `lesson.md`)
-   Save both outputs to `history/cycle-N/gate.json` with each tool's run time. If a tool is missing or crashes, note it in the cycle report and continue without it.
+2. Run the gate on the snapshot: `tools/gate.py history/cycle-N/plan.md --out history/cycle-N/gate.json --mode <mode> --band <band> --house <lesson.md>` (omit `--house` when the project has no `lesson.md`). It runs `timing.py` and `lint.py`, saves both outputs with each tool's run time, and exits 1 when the cycle must be short. If a tool is missing or crashes (exit 2), note it in the cycle report and continue without it.
 3. Every lint finding with severity 1 enters the merge as a severity-1 finding for critic 01, with `source: lint`. Lint findings of severity 2 and 3 are evidence the owning critic may adopt.
 4. Word count: count the plan's words and the change from the previous snapshot, for the cycle report.
 5. **Short cycle:** if `timing.py` or `lint.py` exits 1, this cycle runs critic 01 and the editor only. A lesson that does not fit its slot, or breaks a house rule, is not improved by a full panel. Short cycles count toward the cycle cap.
