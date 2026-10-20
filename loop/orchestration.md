@@ -63,8 +63,8 @@ Spawn one subagent per active critic in a single message.
 **Active critics by cycle:**
 
 - Short cycle (gate failed): 01 runnable only, unless `--only` names critics (then those run, so a focused pass or an eval still sees its critics).
-- Cycle 1, and any cycle where runnable scored below 8 last time: 01 runnable, 02 learning design, 03 practical, 04 modalities, 08 clarity.
-- Once runnable has scored ≥ 8: all nine, adding 05 engagement, 06 story, 07 media, 09 design. A lesson that does not fit its slot is not made better by jokes.
+- Cycle 1 with a passing gate: 01 runnable, 02 learning design, 03 practical, 04 modalities, 08 clarity.
+- From cycle 2, whenever the gate passes: all nine, adding 05 engagement, 06 story, 07 media, 09 design. A lesson that does not fit its slot is not made better by jokes, and the gate is what says whether it fits; the runnable findings that remain once it passes (materials, prepare lines, fast and slow paths) do not make an engagement or story finding wrong. (Gating the full panel on runnable's score instead starved the engagement lenses on the first real run: with a token cap, the nine-critic panel would never have run.)
 - With `--only`, just those.
 
 **Model and effort.** Critics 01 and 08 are checklist critics fed by tool output: run them on the smaller model the host offers at low effort, with `gate.json` attached. Critics 02 to 07 and 09 run on the main model at normal effort. The editor (3.5) runs at high effort.
@@ -105,7 +105,7 @@ Spawn one subagent per active critic in a single message.
 
 - **Bar:** the full panel (or the `--only` set) ran this cycle, the gate passed, no severity-1 or severity-2 finding is open from any active critic, and every derived score is ≥ bar.
 - **Plateau:** from cycle 2, a cycle (not a short one) that closed no severity-1 or severity-2 finding and opened no new one.
-- **Cap:** cycle N = the cycle cap (default 4), or the run's tokens have reached the token cap.
+- **Cap:** cycle N = the cycle cap (default 4), or the run's tokens have reached the token cap, or they would before the next cycle's critics finish: run total + this cycle's editor estimate (the last editor's tokens) + the next panel's estimate (this cycle's critic tokens) > cap. The editor's output is only delivered once critics have scored it, so a cycle the budget cannot score is not started.
 
 On any stop, if the best snapshot ranks above this one, restore it: copy `history/cycle-<best>/` back over the plan and media briefs, and say so in `final.md` with what the later cycles changed. Then go to 4.
 
