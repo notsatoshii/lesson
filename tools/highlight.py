@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Callouts on a screenshot (Pillow only).
 
-Usage: python highlight.py <screenshot.png> --spec <brief.md> [--out <path>] [--scale 1.0] [--color #FF4D2E]
+Usage: python highlight.py <screenshot.png> --spec <brief.md> [--out <path>] [--scale 1.0] [--size 1.0] [--color #FF4D2E]
        python highlight.py <screenshot.png> --box x,y,w,h[,"label"] --arrow x1,y1,x2,y2 --badge x,y,n
                                             --blur x,y,w,h --crop x,y,w,h
        python highlight.py --demo [--out <path>]
@@ -26,6 +26,7 @@ RADIUS = 8
 BADGE = 28
 BLUR_RADIUS = 12
 FONT_SIZE = 16
+SIZE = 1.0  # --size multiplier for strokes, badges, labels (2 for a dpr-2 capture)
 FONT_PATHS = [
     "C:/Windows/Fonts/malgun.ttf",
     "C:/Windows/Fonts/NotoSansKR-Regular.ttf",
@@ -160,6 +161,7 @@ def parse_inline(a, start=0):
 
 
 def arrow_head(d, x1, y1, x2, y2, color, length=14, half=7):
+    length, half = length * SIZE, half * SIZE
     dx, dy = x2 - x1, y2 - y1
     dist = (dx * dx + dy * dy) ** 0.5 or 1.0
     ux, uy = dx / dist, dy / dist
@@ -170,25 +172,34 @@ def arrow_head(d, x1, y1, x2, y2, color, length=14, half=7):
 
 
 def draw_badge(d, cx, cy, n, color, font):
-    r = BADGE / 2
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=2)
+    r = BADGE * SIZE / 2
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color, outline="white", width=max(2, round(2 * SIZE)))
     text = str(n)
     l, t, rgt, b = d.textbbox((0, 0), text, font=font)
     d.text((cx - (rgt - l) / 2 - l, cy - (b - t) / 2 - t), text, font=font, fill="white")
 
 
-def draw_label(d, img_w, img_h, x, y, w, h, text, color, font, pad=(10, 5)):
+def draw_label(d, img_w, img_h, x, y, w, h, text, color, font, pad=(10, 5), arrow=False):
+    pad = (pad[0] * SIZE, pad[1] * SIZE)
     l, t, rgt, b = d.textbbox((0, 0), text, font=font)
     tw, th = rgt - l, b - t
     pw, ph = tw + pad[0] * 2, th + pad[1] * 2
-    px = min(max(x + BADGE / 2 + 6, 0), img_w - pw)  # right of the badge at the top-left corner
-    py = y - ph - 6 if y - ph - 6 >= 0 else y + h + 6  # above the box, else below
+    gap = 6 * SIZE
+    px = min(max(x + BADGE * SIZE / 2 + gap, 0), img_w - pw)  # right of the badge at the top-left corner
+    if arrow:  # beside the badge at the arrow's tail, vertically centred, so the two never overlap
+        py = y - ph / 2
+    else:
+        py = y - ph - gap if y - ph - gap >= 0 else y + h + gap  # above the box, else below
+    py = max(py, 0)
     py = min(py, img_h - ph)
     d.rounded_rectangle([px, py, px + pw, py + ph], radius=ph / 2, fill=color)
     d.text((px + pad[0] - l, py + pad[1] - t), text, font=font, fill="white")
 
 
-def render(img, items, color=ACCENT, scale=1.0, font_path=None):
+def render(img, items, color=ACCENT, scale=1.0, font_path=None, size=1.0):
+    global SIZE
+    SIZE = size
+    stroke = max(1, round(STROKE * SIZE))
     img = img.convert("RGB")
     sc = lambda v: v * scale  # noqa: E731
     ox = oy = 0.0
@@ -206,29 +217,29 @@ def render(img, items, color=ACCENT, scale=1.0, font_path=None):
         if box[2] > box[0] and box[3] > box[1]:
             img.paste(img.crop(box).filter(ImageFilter.BoxBlur(BLUR_RADIUS)), box)
     d = ImageDraw.Draw(img)
-    font, used = load_font(FONT_SIZE, font_path)
-    badge_font, _ = load_font(15, font_path)
+    font, used = load_font(round(FONT_SIZE * SIZE), font_path)
+    badge_font, _ = load_font(round(15 * SIZE), font_path)
     badges, labels = [], []
     for it in items:
         if it["kind"] == "box":
             x, y, w, h = sc(it["x"]) - ox, sc(it["y"]) - oy, sc(it["w"]), sc(it["h"])
-            d.rounded_rectangle([x, y, x + w, y + h], radius=RADIUS, outline=color, width=STROKE)
+            d.rounded_rectangle([x, y, x + w, y + h], radius=RADIUS * SIZE, outline=color, width=stroke)
             if it.get("n"):
                 badges.append((x, y, it["n"]))
             if it.get("label"):
-                labels.append((x, y, w, h, it["label"]))
+                labels.append((x, y, w, h, it["label"], False))
         elif it["kind"] == "arrow":
             x1, y1, x2, y2 = sc(it["x1"]) - ox, sc(it["y1"]) - oy, sc(it["x2"]) - ox, sc(it["y2"]) - oy
             bx, by = arrow_head(d, x1, y1, x2, y2, color)
-            d.line([(x1, y1), (bx, by)], fill=color, width=STROKE)
+            d.line([(x1, y1), (bx, by)], fill=color, width=stroke)
             if it.get("n"):
                 badges.append((x1, y1, it["n"]))
             if it.get("label"):
-                labels.append((x1, y1, 0, 0, it["label"]))
+                labels.append((x1, y1, 0, 0, it["label"], True))
         elif it["kind"] == "badge":
             badges.append((sc(it["x"]) - ox, sc(it["y"]) - oy, it["n"]))
-    for x, y, w, h, text in labels:
-        draw_label(d, W, H, x, y, w, h, text, color, font)
+    for x, y, w, h, text, is_arrow in labels:
+        draw_label(d, W, H, x, y, w, h, text, color, font, arrow=is_arrow)
     for x, y, n in badges:
         draw_badge(d, x, y, n, color, badge_font)
     return img, used
@@ -254,6 +265,7 @@ def main():
     ap.add_argument("--spec", help="media brief (.md) with a screenshot+highlights section")
     ap.add_argument("--out")
     ap.add_argument("--scale", type=float, default=1.0, help="multiply all coordinates (e.g. 2 for a 2x capture)")
+    ap.add_argument("--size", type=float, default=1.0, help="multiply stroke, badge and label sizes (2 for a dpr-2 capture)")
     ap.add_argument("--color", default=ACCENT)
     ap.add_argument("--font", help="TTF/OTF to use for labels (default: Malgun, then Noto Sans KR, then Pillow's)")
     ap.add_argument("--box", action="append", metavar='x,y,w,h[,"label"]')
@@ -291,7 +303,7 @@ def main():
         out = a.out or root + ".hl.png"
         source = a.screenshot
 
-    result, font_used = render(img, items, a.color, a.scale, a.font)
+    result, font_used = render(img, items, a.color, a.scale, a.font, a.size)
     result.save(out)
     counts = {}
     for it in items:
