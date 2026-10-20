@@ -29,6 +29,7 @@ You are the only writer in this cycle. You get the ranked findings, the decision
 ## While revising
 
 - Write every learner-facing line in the house-rule language and register, natively. If the rule is Korean 존댓말, write the Korean line from the intent, then read it back for translationese (당신, noun stacks, carried-over idioms, 보장/반드시).
+- On a normalized plan (`author line:` and `teacher notes (author):` fields), never edit an author line. When the house rules lock the author's copy, the `instruction:` you write renders the author line's intent in the house language and register; the author line stays beside it. List every new learner-facing string you wrote in your report, so `final.md` can put them up for review.
 - Keep names consistent: a concept, a character, an icon and a media label all use the same word everywhere, including the media briefs.
 - When a finding asks for a visual, write or update the media brief (`templates/media-brief.md`) with Purpose, Replaces and the spec, and update the plan's media row. Produce the asset only if the tooling note says you can; otherwise status stays `brief`.
 - When a finding asks for story or humour, write the actual line, not a note that says "add a joke here".

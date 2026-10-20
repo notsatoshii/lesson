@@ -8,18 +8,21 @@ After the interview the loop never asks the user anything. Not "continue?", not 
 
 1. Resolve the argument: a plan file (`.md`), a folder of lessons (course mode), or a bare topic in quotes (new draft). Record the entry file(s) and the output folder `docs/lessons/<slug>/`.
 2. New draft or existing? Existing = a plan file with segments and timings exists. New = only a topic, or a file that is notes without a time structure (then the notes are input to the interview, not a plan).
-3. House rules: read `lesson.md` in the project root if present, then the project's CLAUDE.md. Pull out: language and register, forbidden words, product-name bans, session length caps, age or audience fixed by the project, curriculum facts that may not be invented and where they live, bar override, cycle override, token cap. Write them into the brief's House rules section verbatim.
-4. Existing brief at `docs/lessons/<slug>/brief.md`? Use it as is, unless the user asked for a new interview in the command itself. Do not ask whether anything changed.
-5. Mode: live, online, video, guide, talk. From the flag, else from the plan, else asked in round 1.
-6. Taste layer: load in the order `taste/README.md` gives. If the owner's file is missing, note it in the brief and continue without it.
-7. Tooling: note what is installed for media (the `diagram` skill and `tools/diagram/`, `tools/highlight.py` with Pillow, `tools/capture.py`, `tools/icons.py`, `tools/guide.py`, `tools/narrate.py`, `tools/quiz_export.py`, `tools/video/`, a browser for screenshots, `motion-anything`, `dataviz`) and for design (`uiux`, `impeccable`). Check `tools/lint.py` and `tools/timing.py` run. Critics 07 and 09 are told what exists so their fixes are producible.
-8. Budget: bar (`--bar`, else house rules, else 8), cycle cap (`--cycles`, else house rules, else 4), token cap (house rules, else `taste/defaults.md`). Write all three into the brief header.
+3. Working copy. The loop always edits `docs/lessons/<slug>/plan.md`. An existing plan anywhere else (a curriculum folder, a doc in another format) is copied there and the source is never edited. When the copy is not in the shape of `templates/lesson-plan.md` (the gate tools read the header line, the `| S<n> |` table and the `#### S<n>` blocks), normalize it before cycle 1, mechanically: one table row per timed block with its minutes, beat and the channels it really uses; every line the author wrote kept verbatim in the detail block as `author line: "…"` (quoted learner-facing words) or `teacher notes (author):` (everything else); `none in source` in every template field the source lacks; no fixes, no new copy, no `instruction:` lines (the editor writes those, in the house-rule language, from the author lines). A fixed program rhythm with no slack gets `buffer: 0 %` in the header. Log the normalization as a decision.
+4. House rules: read `lesson.md` in the project root if present, then the project's CLAUDE.md. Pull out: language and register, forbidden words, product-name bans, session length caps, age or audience fixed by the project, curriculum facts that may not be invented and where they live, bar override, cycle override, token cap. Write them into the brief's House rules section verbatim.
+5. Existing brief at `docs/lessons/<slug>/brief.md`? Use it as is, unless the user asked for a new interview in the command itself. Do not ask whether anything changed.
+6. Mode: live, online, video, guide, talk. From the flag, else from the plan, else asked in round 1.
+7. Taste layer: load in the order `taste/README.md` gives. If the owner's file is missing, note it in the brief and continue without it.
+8. Tooling: note what is installed for media (the `diagram` skill and `tools/diagram/`, `tools/highlight.py` with Pillow, `tools/capture.py`, `tools/icons.py`, `tools/guide.py`, `tools/narrate.py`, `tools/quiz_export.py`, `tools/video/`, a browser for screenshots, `motion-anything`, `dataviz`) and for design (`uiux`, `impeccable`). Check `tools/lint.py` and `tools/timing.py` run. Critics 07 and 09 are told what exists so their fixes are producible.
+9. Budget: bar (`--bar`, else house rules, else 8), cycle cap (`--cycles`, else house rules, else 4), token cap (house rules, else `taste/defaults.md`). Write all three into the brief header.
 
 ## 1. Interview
 
 Run `interview/questions.md` with the `grilling` skill's round format. Ask only what the files cannot answer: skip anything settled by the brief, the house rules or the plan. End by reading back the definition of done in one block, write the brief, and start. There is no approval step. A `--dry` run stops after the brief.
 
-With `--skip-interview` and no brief: write the brief from the files and the house rules, fill each open question with its recommended answer, and log each one as a decision the loop made.
+With `--skip-interview` and no brief: write the brief from the files and the house rules, fill each open question with its recommended answer, and log each one as a decision the loop made. Write the answers, numbered as in `interview/questions.md`, under the brief's "Answers the loop filled in", each with its source file; the definition of done is written, not read back.
+
+When the house rules hold two rules that collide for this lesson (a break rule against a fixed program rhythm, a copy lock against a language rule), settle the reading once in the brief's House rules section, as a decision, so every critic applies the same reading and none raises the collision as a finding every cycle.
 
 ## 2. First draft (new lessons only)
 
