@@ -2,6 +2,8 @@
 
 slug: <slug> · mode: <live|online|video|guide|talk> · age band: <see taste/age-bands.md> · group: <1 | 2–6 | 7–30 | 30+> · total: <N> min · version: <N> · written: <YYYY-MM-DD>
 
+(Optional on the same line: `buffer: N %` when the program fixes the rhythm and leaves no slack, e.g. `buffer: 0 %`; the mode default applies otherwise.)
+
 ## Outcome
 
 By the end, each learner **can** <one verb phrase, observable> and **has made** <the artifact, on their own material>. Evidence: <what the teacher or app sees that proves it; never self-report>.
@@ -39,7 +41,7 @@ What "good" looks like, shown to learners before they attempt the task, never on
 
 ## Segments
 
-Every segment has one beat, a modality mix, and a clock. Beats: **hook** (a situation or prediction), **learn** (one idea, one analogy, one micro-interaction), **try** (practice on provided material, safe to fail), **apply** (the same move on the learner's own material, produces the artifact), **check** (evidence of learning, one verification habit), **reward** (progress shown, next thing teased). Modalities: **do** / **see** / **read** / **listen**; mark every channel the segment actually uses.
+Every segment has one beat, a modality mix, and a clock. Beats: **hook** (a situation or prediction), **learn** (one idea, one analogy, one micro-interaction), **try** (practice on provided material, safe to fail), **apply** (the same move on the learner's own material, produces the artifact), **check** (evidence of learning, one verification habit), **reward** (progress shown, next thing teased), and **open** for a break, free talk or Q&A the learners lead (neither active nor passive: it ends a passive stretch and is exempt from the single-segment cap). Modalities: **do** / **see** / **read** / **listen**; mark every channel the segment actually uses.
 
 | id | min | beat | title | what happens (learner's view) | modalities | media | game | story / humour |
 |---|---|---|---|---|---|---|---|---|
@@ -50,7 +52,7 @@ Every segment has one beat, a modality mix, and a clock. Beats: **hook** (a situ
 | S5 | 4 | check | <…> | <…> | do · read | – | – | <…> |
 | S6 | 1 | reward | <…> | <…> | see | – | badge / progress | <callback> |
 
-Timing rule: segments sum to total minus a buffer (live: 10 %, online: none, video: none, talk: 5 %). The longest passive stretch (learner only sees / reads / listens) is capped by the age band.
+Timing rule: segments sum to total minus a buffer (live: 10 %, online: none, video: none, talk: 5 %; a `buffer:` header value overrides it). The longest passive stretch (learner only sees / reads / listens) is capped by the age band.
 
 ### Segment detail
 

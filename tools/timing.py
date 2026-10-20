@@ -3,7 +3,7 @@
 
 Usage: python timing.py <plan.md> [--mode live|online|video|guide|talk] [--band A..G] [--json]
 
-Reads the plan's header line (total, mode, age band) and its Segments table, then reports: segment
+Reads the plan's header line (total, mode, age band, optional "buffer: N %") and its Segments table, then reports: segment
 minutes against the total and the mode buffer, active vs passive minutes, the longest passive
 stretch and the longest segment against the age-band caps, beats present and missing, and how
 many segments use each channel. Exit 1 when a check fails so a loop can gate on it. The editor
@@ -20,6 +20,9 @@ CAPS = {"A": (3, 8), "B": (5, 12), "C": (7, 15), "D": (10, 20), "E": (12, 20), "
 # active : passive floor from the same file (2:1 in A-C, 1:1 from D up); reported as a warning only
 RATIO_FLOOR = {"A": 2.0, "B": 2.0, "C": 2.0, "D": 1.0, "E": 1.0, "F": 1.0, "G": 1.0}
 BEATS = ["hook", "learn", "try", "apply", "check", "reward"]
+# "open": a break, free talk or Q&A the learners lead. Neither active nor passive: it ends a passive
+# stretch, is exempt from the single-segment cap, and is reported on its own line.
+OPEN_BEATS = {"open"}
 ACTIVE_BEATS = {"try", "apply", "check"}
 CHANNELS = ["do", "see", "read", "listen"]
 TOLERANCE = 1.0  # minutes of slack on the total before OVER / UNDER fails
@@ -39,7 +42,7 @@ def fmt(n):
 
 
 def parse_header(text):
-    head = {"total": None, "mode": None, "band": None}
+    head = {"total": None, "mode": None, "band": None, "buffer": None}
     for line in text.splitlines():
         m = re.search(r"total\s*:\s*\**\s*(\d+)\s*\**\s*min", line, re.I)
         if not m:
@@ -51,6 +54,10 @@ def parse_header(text):
         m = re.search(r"\bband\s*:\s*\**\s*([A-G])\b", line, re.I)
         if m:
             head["band"] = m.group(1).upper()
+        # "buffer: 0 %" overrides the mode default, for a fixed program rhythm with no slack
+        m = re.search(r"\bbuffer\s*:\s*\**\s*(\d+(?:\.\d+)?)\s*%", line, re.I)
+        if m:
+            head["buffer"] = float(m.group(1)) / 100
         break
     return head
 
@@ -111,19 +118,21 @@ def parse_segments(text):
         if minutes is None:
             warnings.append(f"{seg_id}: no minutes found, counted as 0")
             minutes = 0.0
-        if beat not in BEATS:
+        if beat not in BEATS and beat not in OPEN_BEATS:
             warnings.append(f"{seg_id}: beat '{beat_cell}' is not one of {', '.join(BEATS)}")
-        if not mods:
+        if not mods and beat not in OPEN_BEATS:
             warnings.append(f"{seg_id}: no modalities cell (do/see/read/listen), treated as passive")
-        active = "do" in mods or beat in ACTIVE_BEATS
-        segs.append({"id": seg_id, "min": minutes, "beat": beat, "title": title, "modalities": mods, "active": active})
+        is_open = beat in OPEN_BEATS
+        active = not is_open and ("do" in mods or beat in ACTIVE_BEATS)
+        segs.append({"id": seg_id, "min": minutes, "beat": beat, "title": title, "modalities": mods,
+                     "active": active, "open": is_open})
     return segs, warnings
 
 
 def longest_passive(segs):
     best, cur = (0.0, []), (0.0, [])
     for s in segs + [None]:
-        if s is None or s["active"]:
+        if s is None or s["active"] or s["open"]:
             if cur[0] > best[0]:
                 best = cur
             cur = (0.0, [])
@@ -148,7 +157,7 @@ def analyse(text, mode=None, band=None):
         warnings.append("age band unknown (header or --band); band caps not checked")
 
     total = head["total"]
-    buf = BUFFER.get(mode or "", 0.0)
+    buf = head["buffer"] if head["buffer"] is not None else BUFFER.get(mode or "", 0.0)
     budget = round(total * (1 - buf), 1) if total else None
     s_sum = sum(s["min"] for s in segs)
     timing = {"sum": s_sum, "total": total, "mode": mode, "buffer_pct": int(buf * 100), "budget": budget}
@@ -169,10 +178,12 @@ def analyse(text, mode=None, band=None):
         timing["status"] = "unknown"
 
     active = sum(s["min"] for s in segs if s["active"])
-    passive = s_sum - active
+    open_min = sum(s["min"] for s in segs if s["open"])
+    passive = s_sum - active - open_min
     ratio = round(active / passive, 2) if passive else None
     stretch_min, stretch_ids = longest_passive(segs)
-    longest_seg = max(segs, key=lambda s: s["min"]) if segs else None
+    capped = [s for s in segs if not s["open"]]
+    longest_seg = max(capped, key=lambda s: s["min"]) if capped else None
 
     caps = CAPS.get(band or "")
     if caps:
@@ -203,6 +214,7 @@ def analyse(text, mode=None, band=None):
         "band": band,
         "timing": timing,
         "active_min": active,
+        "open_min": open_min,
         "passive_min": passive,
         "active_to_passive": ratio,
         "longest_passive": {"min": stretch_min, "segments": stretch_ids, "cap": caps[0] if caps else None},
@@ -225,7 +237,8 @@ def report(r):
         f"timing: {fmt(t['sum'])} min of {budget} budget ({t['total'] or '?'} total, {t['buffer_pct']} % buffer) -> {t['status']}",
     ]
     ratio = f"{r['active_to_passive']}:1" if r["active_to_passive"] is not None else "all active"
-    lines.append(f"active {fmt(r['active_min'])} / passive {fmt(r['passive_min'])} min ({ratio})")
+    open_part = f" / open {fmt(r['open_min'])}" if r["open_min"] else ""
+    lines.append(f"active {fmt(r['active_min'])} / passive {fmt(r['passive_min'])}{open_part} min ({ratio})")
     lp = r["longest_passive"]
     cap = f" (cap {lp['cap']})" if lp["cap"] else ""
     lines.append(f"longest passive stretch: {fmt(lp['min'])} min {' '.join(lp['segments']) or '-'}{cap}")
