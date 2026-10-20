@@ -108,17 +108,17 @@ Never: points for attendance, XP for self-reported anything, rewards promised in
 
 ## Text, by band
 
-Learner-facing text only. "Define before use" means the term appears in plain words first, then named, in the same segment.
+Learner-facing text only; the same numbers `tools/lint.py` gates on (Korean counts 어절), which a house `words per screen:` / `sentence length:` line overrides. "Define before use" means the term appears in plain words first, then named, in the same segment.
 
 | band | max words per screen or slide | sentence length | terms |
 |---|---|---|---|
 | A | one short sentence, read aloud | up to 8 words | no new terms unless the term is the lesson |
 | B | 40 | up to 12 words | concrete nouns; one new term per segment |
-| C | 60 | up to 15 words | define every term once, in their world |
-| D | 80 | up to 20 words | adult level; define once, then use |
-| E | 80, phone-readable | up to 20 words | plain words first, an everyday analogy for each new concept, jargon only after defined |
-| F | as E | as E | as E |
-| G | 40, larger type | up to 15 words | no acronyms; step numbers always visible |
+| C | 50 | up to 15 words | define every term once, in their world |
+| D | 60 | up to 20 words | adult level; define once, then use |
+| E | 50, one phone screen | up to 15 words | plain words first, an everyday analogy for each new concept, jargon only after defined |
+| F | 60 | up to 20 words | as E |
+| G | 30, larger type | up to 12 words | no acronyms; step numbers always visible |
 
 Korean: 존댓말 unless the house rules say otherwise; write from intent, not from an English draft; `word-break: keep-all` on screens; no 당신, no 보장 / 반드시.
 

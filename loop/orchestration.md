@@ -58,7 +58,7 @@ Cycle N runs: gate → critics → merge → decide → editor. Every stop is de
 
 Spawn one subagent per active critic in a single message.
 
-**Prompt order.** Every critic gets the identical material first, in this order, so prompt caching can work: `critics/00-shared.md`, the taste layer paths (`taste/README.md` names them) and the owner's taste file path when present, the brief, the house rules section and tooling note from intake, the plan and media brief paths, `gate.json`. Then the parts that differ, last: the blind pair paths, its closure checklist (the previous cycle's `fixed` findings for its lens, each with the new text's location from the editor's report), `full` or `delta`, its output path, its own `critics/NN-*.md` and its `critics/examples/NN-*.md`. Nothing else: never the editor's reasoning, previous scores or other critics' findings.
+**Prompt order.** Every critic gets the identical material first, in this order, so prompt caching can work: `critics/00-shared.md`, the run's taste digest (`docs/lessons/<slug>/taste-digest.md`, built once at intake with `tools/taste_digest.py --band <band> --mode <mode>`: the owner's file whole and only the band's and mode's parts of the skill's taste files), the brief, the house rules section and tooling note from intake, the plan and media brief paths, `gate.json`. Then the parts that differ, last: the blind pair paths, its closure checklist (the previous cycle's `fixed` findings for its lens, each with the new text's location from the editor's report), `full` or `delta`, its output path, its own `critics/NN-*.md` and its `critics/examples/NN-*.md`. Nothing else: never the editor's reasoning, previous scores or other critics' findings.
 
 **Active critics by cycle:**
 
@@ -73,7 +73,7 @@ Spawn one subagent per active critic in a single message.
 
 **Output.** Each critic writes its JSON to `docs/lessons/<slug>/history/cycle-N/critic-NN.json` and returns one line: path, score, severity-1 count. The orchestrator merges from the files and never pastes a critic's JSON into its own context beyond what the merge needs. A file without check results, a quoted anchor or a `weakest` entry, or with a finding that has no location, is rejected and that critic re-run once.
 
-**Tokens.** Record each subagent's token use. The cycle report carries this cycle's total, the run total and the cap.
+**Tokens.** Tell every critic to open all its inputs in one batch of parallel reads, then write its JSON: each extra turn re-reads the whole context, and a critic that reads file by file spends about half again as much (first real run: 151k tokens for one critic on a 120-minute plan). Record each subagent's token use. The cycle report carries this cycle's total, the run total and the cap.
 
 ### 3.3 Merge
 

@@ -11,6 +11,12 @@ Scripts the loop, the critics and the editor use for evidence and for producing 
 
 `gate.py <plan.md> --out <history/cycle-N/gate.json> [--mode] [--band] [--house]` runs both with UTF-8 forced on the pipe (Korean otherwise breaks on Windows), saves `gate.json` with each tool's exit code and run time, prints a three-line summary and exits 1 when the cycle must be short. The loop saves both outputs to `history/cycle-N/gate.json`, passes `--house` when the project has a `lesson.md`, and runs a short cycle (critic 01 and the editor) when either fails.
 
+## Run setup
+
+| script | used by | input → output |
+|---|---|---|
+| `taste_digest.py --band B --mode M --out docs/lessons/<slug>/taste-digest.md [--owner f] [--project taste.md]` | the orchestrator at intake; every critic reads it | the owner's file whole plus the band's and mode's parts of `taste/` (band tables cut to one row) → one file, about two thirds the size of the six it replaces. Stdlib only. |
+
 ## Media
 
 | script | used by | input → output |
