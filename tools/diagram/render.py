@@ -76,11 +76,14 @@ def mermaid_source(path, block):
     return blocks[block - 1].strip()
 
 
-def checks(src, fmt):
+def checks(src, fmt, landscape=False):
     warnings = []
     m = FLOW_RE.search(src)
-    if m and m.group(2).upper() in ("LR", "RL"):
-        warnings.append(f"flowchart {m.group(2).upper()}: phones read top-down; prefer `flowchart TD`")
+    if m and m.group(2).upper() in ("LR", "RL") and not landscape:
+        warnings.append(f"flowchart {m.group(2).upper()}: phones read top-down; prefer `flowchart TD` "
+                        "(or pass --landscape for a projected 16:9 slide)")
+    if m and m.group(2).upper() in ("TD", "TB", "BT") and landscape:
+        warnings.append("--landscape with a top-down flowchart: on a 16:9 slide a tall chain shrinks; prefer `flowchart LR`")
     if m:
         body = "\n".join(l for l in src.splitlines() if not re.match(r"^\s*(%%|classDef|class |style |linkStyle|subgraph|end\b)", l))
         nodes = {n for n in NODE_RE.findall(body) for n in [n[0]] if n.lower() not in ("flowchart", "graph", "click")}
@@ -101,6 +104,7 @@ def main():
     ap.add_argument("--scale", type=float, default=2)
     ap.add_argument("--config", default=str(HERE / "mermaid.json"))
     ap.add_argument("--css", default=str(HERE / "theme.css"))
+    ap.add_argument("--landscape", action="store_true", help="the diagram goes on a projected 16:9 slide, not a phone")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
 
@@ -116,7 +120,7 @@ def main():
     mmdc = shutil.which("mmdc")
     if not mmdc:
         sys.exit("render.py: mmdc not found; npm i -g @mermaid-js/mermaid-cli (set PUPPETEER_SKIP_DOWNLOAD=1 to reuse the installed Chrome)")
-    warnings, n_nodes = checks(src, fmt)
+    warnings, n_nodes = checks(src, fmt, a.landscape)
     with tempfile.TemporaryDirectory() as tmp:
         mmd = pathlib.Path(tmp) / "diagram.mmd"
         mmd.write_text(src + "\n", encoding="utf-8")

@@ -24,7 +24,7 @@ Scripts the loop, the critics and the editor use for evidence and for producing 
 | `highlight.py <shot.png> --spec <brief.md> [--out x.hl.png] [--scale 1] [--size 1] [--color #FF4D2E]` | critic 07, the editor | a screenshot plus a media brief → numbered boxes, arrows, label pills and blurred regions in one accent colour, `<name>.hl.png`. Pillow. |
 | `capture.py <url\|file.html> --out shot.png [--width 390 --height 844] [--select CSS [--label T] [--arrow]]... [--mask CSS]... [--click\|--fill\|--press]... [--brief M2.md] [--highlight]` | the editor for screenshot briefs | a web page at phone width → the screenshot, callout lines with real coordinates written into the brief, private data masked before capture, optional `.hl.png`. Playwright on the installed Chrome. |
 | `icons.py fetch <family> <name>... [--color] [--size 48] [--out dir] [--lesson plan.md] [--switch]` | the editor for icon sets | Iconify icons → SVG plus PNG at 2x, cached offline; one family per lesson, recorded in the plan header. resvg-py, or Chrome. |
-| `diagram/render.py <file.mmd\|brief.md> --out x.png [--block 1] [--scale 2]` | the editor for diagram briefs | a Mermaid block → PNG at 2x with the house theme and a Korean font; warns over 7 boxes, on left-to-right flowcharts and on SVG output. mermaid-cli. |
+| `diagram/render.py <file.mmd\|brief.md> --out x.png [--block 1] [--scale 2] [--landscape]` | the editor for diagram briefs | a Mermaid block → PNG at 2x with the house theme and a Korean font; warns over 7 boxes, on left-to-right flowcharts (top-down ones with `--landscape`, for a projected 16:9 slide, where a tall chain shrinks to unreadable) and on SVG output. mermaid-cli. |
 | `guide.py <plan.md> --out guide.pdf [--png-dir dir] [--handout [file.pdf]] [--steps S1,S2]` | guide mode | a guide plan plus its `.hl.png` shots → a Marp step deck (PDF and phone PNGs) and a printable Typst handout; gaps become visible `[needs …]` placeholders. marp-cli, Typst. |
 | `narrate.py <brief.md\|script.txt> --out <dir> [--voice ko-KR-SunHiNeural] [--engine edge\|google\|elevenlabs]` | video and animation briefs | the storyboard's voice column → one MP3 per row, a joined MP3, an SRT taken from the script (never speech recognition) and a manifest. edge-tts for drafts. |
 | `quiz_export.py <plan.md> [--kahoot out.xlsx] [--forms out.json] [--anki out.txt] [--list]` | quiz briefs, the owner after a run | the plan's Q/A/W check items → Kahoot import sheet (95/60 character limits), Google Forms quiz body, Anki import file. openpyxl. |
@@ -41,7 +41,7 @@ winget install --id Typst.Typst
 cd tools/video && npm install
 ```
 
-Set `PUPPETEER_SKIP_DOWNLOAD=1` before the npm installs to reuse the installed Chrome instead of downloading a browser. Korean text needs Malgun Gothic or Noto Sans KR; every tool looks for both.
+Run marp-cli from a script or a non-interactive shell with `--no-stdin` (it otherwise waits on stdin and hangs; `guide.py` already passes it) and `CHROME_PATH` pointing at the installed Chrome. Set `PUPPETEER_SKIP_DOWNLOAD=1` before the npm installs to reuse the installed Chrome instead of downloading a browser. Korean text needs Malgun Gothic or Noto Sans KR; every tool looks for both.
 
 Run from anywhere: `python <skill-dir>/tools/timing.py docs/lessons/mail-triage-1/plan.md`.
 
