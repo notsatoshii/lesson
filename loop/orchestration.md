@@ -117,6 +117,10 @@ Else run the editor (3.5), then cycle N+1.
 
 One subagent at high effort, `editor/revise.md`, gets the ranked list, the decisions for this cycle, the brief, the house rules, the time budget note and the file paths. It works segment by segment, severity 1 and 2 fully, severity 3 as far as the cycle budget allows, and returns per finding what it did and the location of the new text, plus any call it had to make itself (logged with the orchestrator's). It may not add activities from the ideas list and may not touch files outside the lesson's folder.
 
+### 3.5b Production
+
+When the brief or the owner asks for produced media (the usual case: slides, sheets, screenshots, diagrams, video), one production subagent runs after each editor pass. It rebuilds, from the briefs the editor changed, every asset the tools can make: `tools/diagram/render.py`, `tools/icons.py`, `tools/capture.py` + `tools/highlight.py`, marp-cli, `tools/worksheet.py`, `tools/narrate.py` + `tools/video/storyboard.py`. It writes only to `media/out/` and keeps `media/out/README.md` current: every file, the brief it serves, its tool, what could not be met and why. It never edits the plan or the briefs. It looks at every PNG and at video frames it extracts (`ffmpeg -vf fps=1/8`) before it finishes. It may make small, backwards-compatible tool changes, which the orchestrator commits. From then on, critics 04, 07, 08 and 09 judge the produced files as well as the briefs (07's "Produced assets" check). A cycle's critics see assets built from that cycle's briefs, never from older ones.
+
 ### 3.6 Report
 
 Write `docs/lessons/<slug>/cycle-N.md` from `templates/cycle-report.md`: gate line, tokens and words, scores and comparisons, findings with votes, closure tally, disagreements, decisions the loop made, proposed rewrites, needs-fact markers, the editor's note, the decision. Write it before the editor runs when the cycle stops, after the editor when it continues.

@@ -15,7 +15,7 @@ The loop exists for one reason: a lesson that is correct can still be dull, pass
 1. **Intake** (you, no questions): find the plan (a file, a folder of lessons, or only a topic), decide new draft vs existing, read the house rules (`lesson.md` in the project root, then CLAUDE.md), find an existing brief, load the taste layer (`taste/README.md`). Facts come from the filesystem, never from the user.
 2. **Interview** (`interview/questions.md`): rounds of numbered questions with a recommended answer each, in the style of the `grilling` skill, asking only what the files cannot answer. Ends by reading back the definition of done, writing `docs/lessons/<slug>/brief.md` from `interview/brief-template.md`, and starting. No approval step. Skipped when a brief exists and the user did not ask for a new one; the existing brief is used as is.
 3. **First draft** (only when no plan exists yet): a fact gate first (every fact the plan needs, sourced or marked `needs fact:` in the brief), then the plan from the brief with `templates/lesson-plan.md`, one media brief per visual with `templates/media-brief.md`. Do not review during the draft.
-4. **Cycles** (`loop/orchestration.md`): gate (`tools/timing.py`, `tools/lint.py`) → parallel critics → merged ranked findings → decide (stop or continue) → one editor → repeat.
+4. **Cycles** (`loop/orchestration.md`): gate (`tools/gate.py`) → parallel critics → merged ranked findings (`tools/merge.py`) → decide (stop or continue) → one editor → production of the media the briefs specify (`media/out/`) → repeat.
 5. **Report**: `docs/lessons/<slug>/cycle-N.md` per cycle, `docs/lessons/<slug>/final.md` at the end (with the decisions the loop made, for review), and a five-line summary in chat.
 
 ## Rules that never bend
