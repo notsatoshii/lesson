@@ -8,6 +8,7 @@
 //   colors: {ink, accent, paper, grey_fill, muted, rule}, icons: {name: "path.svg"} (relative to the JSON),
 //   labels: {P: "처리", T: "판단"},
 //   blocks: [ ... ] (see tools/README.md, "worksheet.py"); {"type": "pagebreak"} starts the next page.
+//   {"type": "rule", "thickness": 0.5, "color": "grey_fill", "width": "100%"} draws a hairline (a separator).
 //   {"type": "image", "src": "pic.png", "width": 120, "height": 40, "align": "center", "alt": "...", "caption": runs}
 //   places a picture (PNG, JPG, SVG; path relative to the JSON), aspect ratio kept.
 //
@@ -17,6 +18,7 @@
 //   {"field": 14}  small write-in box, mm wide     {"mark": "P"|"T", "label": "..."}  the 처리 / 판단 chip
 //   {"icon": "brain", "color": "ink", "size": 16}  (size in pt, default the text size)   {"br": true}  line break
 //   {"tag": "3"}  a short value in an outlined box (a level to circle, a score)
+//     optional: "fill" (a filled tag, white text), "text" (text colour), "radius" and "stroke" (pt): a chip
 //   {"sp": 3}  horizontal space, mm
 // Strings are printed as plain text; Typst markup is never evaluated.
 
@@ -117,8 +119,14 @@
     else if "box" in x { tickbox() }
     else if "sp" in x { h(x.sp * 1mm) }
     else if "tag" in x {
-      box(stroke: 0.8pt + col(x.at("color", default: none)), radius: 1.2pt, inset: (x: 0.45em, y: 0.28em),
-        text(weight: "bold", fill: col(x.at("color", default: none)))[#str(x.tag)])
+      // Optional (cycle 7): fill (a filled tag), text (its text colour; white on a fill by default),
+      // radius and stroke (pt). Without them the tag is the 0.8 pt outlined box it always was.
+      let c = col(x.at("color", default: none))
+      let f = if "fill" in x { col(x.fill, default: none) } else { none }
+      let tc = if "text" in x { col(x.text) } else if f != none { white } else { c }
+      box(fill: f, stroke: x.at("stroke", default: 0.8) * 1pt + (if f != none and "color" not in x { f } else { c }),
+        radius: x.at("radius", default: 1.2) * 1pt, inset: (x: 0.45em, y: 0.28em),
+        text(weight: "bold", fill: tc)[#str(x.tag)])
     }
     else if "mark" in x { mark(x.mark, label: x.at("label", default: none)) }
     else if "icon" in x { icon(x.icon, color: col(x.at("color", default: none)), size: if "size" in x { x.size * 1pt } else { 1em }) }
@@ -345,6 +353,7 @@
   else if t == "lines" { b-lines(b) }
   else if t == "cut" { b-cut(b) }
   else if t == "space" { v(b.at("h", default: 4) * 1mm) }
+  else if t == "rule" { line(length: len(b.at("width", default: "100%")), stroke: b.at("thickness", default: 0.5) * 1pt + col(b.at("color", default: "rule"))) }
   else if t == "image" { b-image(b) }
   else if t == "pagebreak" { pagebreak(weak: true) }
   else if t == "columns" {

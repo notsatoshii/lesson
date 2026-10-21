@@ -4,13 +4,16 @@
 Usage: python highlight.py <screenshot.png> --spec <brief.md> [--out <path>] [--scale 1.0] [--size 1.0] [--color #FF4D2E]
        python highlight.py <screenshot.png> --box x,y,w,h[,"label"] --arrow x1,y1,x2,y2 --badge x,y,n
                                             --blur x,y,w,h --crop x,y,w,h [--no-badge]
+                                            --line x1,y1,x2,y2[,x3,y3...] [--line-width px] --pill x,y,"label"
        python highlight.py --demo [--out <path>]
 
 Draws rounded boxes, arrows with a filled head, numbered badges, label pills and blurred regions on a
 screenshot, in one accent colour. --spec reads the numbered callouts list from a media brief's
 screenshot+highlights section; the inline flags do the same by hand. All coordinates are measured on
 the original screenshot; a crop is applied first and later shapes are shifted to match. --no-badge
-keeps the label pills but drops the number badges on boxes and arrows. Output goes
+keeps the label pills but drops the number badges on boxes and arrows. --line draws a plain polyline with no
+head and no badge (a tether from a box to a label); --line-width sets its width in output px (default: the
+box stroke). --pill draws a label pill alone, its left end at x and its top at y. Output goes
 to <name>.hl.png beside the input unless --out is given.
 """
 import argparse
@@ -158,6 +161,16 @@ def parse_inline(a, start=0):
     for spec in a.badge or []:
         x, y, k = spec.split(",")[:3]
         items.append({"kind": "badge", "x": float(x), "y": float(y), "n": int(k)})
+    for spec in getattr(a, "line", None) or []:
+        pts = floats(spec.split(","))
+        if len(pts) < 4 or len(pts) % 2:
+            raise SystemExit(f"--line needs x1,y1,x2,y2[,x3,y3...]: {spec}")
+        items.append({"kind": "line", "points": list(zip(pts[0::2], pts[1::2])), "width": getattr(a, "line_width", None)})
+    for spec in getattr(a, "pill", None) or []:
+        parts = [p.strip() for p in spec.split(",", 2)]
+        if len(parts) < 3 or not parts[2].strip("\"'“”"):
+            raise SystemExit(f'--pill needs x,y,"label": {spec}')
+        items.append({"kind": "pill", "x": float(parts[0]), "y": float(parts[1]), "label": parts[2].strip("\"'“”")})
     return items
 
 
@@ -178,6 +191,22 @@ def draw_badge(d, cx, cy, n, color, font):
     text = str(n)
     l, t, rgt, b = d.textbbox((0, 0), text, font=font)
     d.text((cx - (rgt - l) / 2 - l, cy - (b - t) / 2 - t), text, font=font, fill="white")
+
+
+def pill_size(d, text, font, pad=(10, 5)):
+    """Width and height of a label pill for this text at the current --size."""
+    l, t, rgt, b = d.textbbox((0, 0), text, font=font)
+    return (rgt - l) + pad[0] * SIZE * 2, (b - t) + pad[1] * SIZE * 2
+
+
+def draw_pill(d, x, y, text, color, font, pad=(10, 5)):
+    """A label pill with its left end at x and its top at y (no clamping: --pill places it exactly)."""
+    pad = (pad[0] * SIZE, pad[1] * SIZE)
+    l, t, rgt, b = d.textbbox((0, 0), text, font=font)
+    pw, ph = (rgt - l) + pad[0] * 2, (b - t) + pad[1] * 2
+    d.rounded_rectangle([x, y, x + pw, y + ph], radius=ph / 2, fill=color)
+    d.text((x + pad[0] - l, y + pad[1] - t), text, font=font, fill="white")
+    return pw, ph
 
 
 def draw_label(d, img_w, img_h, x, y, w, h, text, color, font, pad=(10, 5), arrow=False, badge=True, head=None):
@@ -252,8 +281,18 @@ def render(img, items, color=ACCENT, scale=1.0, font_path=None, size=1.0, badges
                 labels.append((x1, y1, 0, 0, it["label"], True, (x2, y2)))
         elif it["kind"] == "badge":
             badges.append((sc(it["x"]) - ox, sc(it["y"]) - oy, it["n"]))
+        elif it["kind"] == "line":  # a plain tether: no head, no badge, square joints
+            pts = [(sc(x) - ox, sc(y) - oy) for x, y in it["points"]]
+            w = max(1, round(it["width"])) if it.get("width") else stroke
+            for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
+                d.line([(x1, y1), (x2, y2)], fill=color, width=w)
+            for x, y in pts[1:-1]:  # fill the corner so an L-turn has no notch
+                d.rectangle([x - (w - 1) / 2, y - (w - 1) / 2, x + w / 2, y + w / 2], fill=color)
     for x, y, w, h, text, is_arrow, head in labels:
         draw_label(d, W, H, x, y, w, h, text, color, font, arrow=is_arrow, badge=badges_on, head=head)
+    for it in items:
+        if it["kind"] == "pill":
+            draw_pill(d, sc(it["x"]) - ox, sc(it["y"]) - oy, it["label"], color, font)
     for x, y, n in badges:
         draw_badge(d, x, y, n, color, badge_font)
     return img, used
@@ -287,6 +326,11 @@ def main():
     ap.add_argument("--badge", action="append", metavar="x,y,n")
     ap.add_argument("--blur", action="append", metavar="x,y,w,h")
     ap.add_argument("--crop", metavar="x,y,w,h")
+    ap.add_argument("--line", action="append", metavar="x1,y1,x2,y2[,x3,y3...]",
+                    help="a plain polyline with no head (a tether from a box to a pill)")
+    ap.add_argument("--line-width", type=float, metavar="px", help="--line width in output px (default: the box stroke)")
+    ap.add_argument("--pill", action="append", metavar='x,y,"label"',
+                    help="a label pill alone, its left end at x and its top at y")
     ap.add_argument("--demo", action="store_true", help="render a grey 800x500 test image with sample callouts")
     ap.add_argument("--no-badge", action="store_true",
                     help="draw boxes and arrows with their label pill but no number badge (explicit --badge stays)")
