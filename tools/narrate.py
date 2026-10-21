@@ -32,7 +32,9 @@ Engines:
 
 Durations come from ffprobe when it is on PATH, else from the MP3 frame headers.
 Joining uses ffmpeg when it is on PATH (with real silence gaps), else a byte join with no gaps
-(the SRT then uses gap 0 so it still matches the joined file).
+(the SRT then uses gap 0 so it still matches the joined file). --trim-tail S (off by default) cuts each
+clip's trailing silence down to S seconds before timing, since edge-tts ends every clip with about 0.95 s
+of silence; durations, the joined file and the SRT then follow the trimmed clips.
 """
 import argparse
 import asyncio
@@ -234,6 +236,26 @@ def duration(path):
     return mp3_duration_frames(path)
 
 
+def trim_tail(path, keep):
+    """Cut a clip's trailing silence (under -45 dB) down to `keep` seconds; edge-tts ends every clip with
+    about 0.95 s of silence. Re-encodes the MP3 at its own sample rate; leaves the file alone without ffmpeg."""
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        print("warn: ffmpeg not found, --trim-tail skipped", file=sys.stderr)
+        return False
+    tmp = path.with_suffix(".trim.mp3")
+    af = (f"areverse,silenceremove=start_periods=1:start_duration=0:start_threshold=-45dB:start_silence={keep},"
+          "areverse")
+    p = subprocess.run([ffmpeg, "-y", "-v", "error", "-i", str(path), "-af", af, "-c:a", "libmp3lame", "-b:a", "48k",
+                        str(tmp)], capture_output=True, text=True)
+    if p.returncode or not tmp.exists():
+        tmp.unlink(missing_ok=True)
+        print(f"warn: --trim-tail failed on {path.name}: {p.stderr.strip()}", file=sys.stderr)
+        return False
+    tmp.replace(path)
+    return True
+
+
 def join(rows, gap, out):
     """Join clips; returns the gap actually used (0 when ffmpeg is missing)."""
     ffmpeg = shutil.which("ffmpeg")
@@ -342,6 +364,9 @@ def main():
     ap.add_argument("--max-chars", type=int, default=32, help="max characters per caption cue")
     ap.add_argument("--name", default="narration", help="base name of the joined MP3, SRT and manifest")
     ap.add_argument("--dry", action="store_true", help="print the rows that would be voiced and stop")
+    ap.add_argument("--trim-tail", type=float, metavar="S",
+                    help="cut each clip's trailing silence down to S seconds (edge ends clips with ~0.95 s); "
+                         "off by default")
     a = ap.parse_args()
 
     src = Path(a.source)
@@ -374,6 +399,9 @@ def main():
     for r in rows:
         r["path"] = out / f"row-{r['n']:02d}.mp3"
     ENGINES[a.engine](rows, voice, a.rate, out)
+    if a.trim_tail is not None:
+        for r in rows:
+            trim_tail(r["path"], a.trim_tail)
 
     joined = out / f"{a.name}.mp3"
     gap = join(rows, a.gap, joined)
