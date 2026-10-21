@@ -6,7 +6,7 @@ Usage:
 
 The JSON holds the sheet: title, footer, the expected page count (`pages`), colours (ink and accent
 default to #221F38 and #D93D22), icons and a list of blocks (header, text, table, checklist, fields,
-strip, columns, panel, oval, lines, cut, space, pagebreak); tools/README.md lists every key. Icon
+strip, columns, panel, oval, lines, cut, space, image, pagebreak); tools/README.md lists every key. Icon
 and image paths are relative to the JSON file.
 
 Compiles templates/worksheet.typ with `typst compile` (Korean font stack: Malgun Gothic, then Noto Sans

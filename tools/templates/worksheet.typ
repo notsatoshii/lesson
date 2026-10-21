@@ -8,12 +8,14 @@
 //   colors: {ink, accent, paper, grey_fill, muted, rule}, icons: {name: "path.svg"} (relative to the JSON),
 //   labels: {P: "처리", T: "판단"},
 //   blocks: [ ... ] (see tools/README.md, "worksheet.py"); {"type": "pagebreak"} starts the next page.
+//   {"type": "image", "src": "pic.png", "width": 120, "height": 40, "align": "center", "alt": "...", "caption": runs}
+//   places a picture (PNG, JPG, SVG; path relative to the JSON), aspect ratio kept.
 //
 // Inline text ("runs") is a string, or a list of strings and objects:
 //   {"text": "...", "bold": true, "color": "accent"|"muted"|"#hex", "size": 12, "strike": true}
 //   {"blank": 30}  write-on line, mm wide          {"box": true}  tick box
 //   {"field": 14}  small write-in box, mm wide     {"mark": "P"|"T", "label": "..."}  the 처리 / 판단 chip
-//   {"icon": "brain", "color": "ink"}             {"br": true}  line break
+//   {"icon": "brain", "color": "ink", "size": 16}  (size in pt, default the text size)   {"br": true}  line break
 //   {"tag": "3"}  a short value in an outlined box (a level to circle, a score)
 //   {"sp": 3}  horizontal space, mm
 // Strings are printed as plain text; Typst markup is never evaluated.
@@ -119,7 +121,7 @@
         text(weight: "bold", fill: col(x.at("color", default: none)))[#str(x.tag)])
     }
     else if "mark" in x { mark(x.mark, label: x.at("label", default: none)) }
-    else if "icon" in x { icon(x.icon, color: col(x.at("color", default: none))) }
+    else if "icon" in x { icon(x.icon, color: col(x.at("color", default: none)), size: if "size" in x { x.size * 1pt } else { 1em }) }
     else if "br" in x { linebreak() }
     else if "text" in x {
       let args = (:)
@@ -318,6 +320,19 @@
   v(1mm)
 }
 
+// A picture (PNG, JPG or SVG; path relative to the JSON). width / height in mm or "100%"; with both,
+// the picture keeps its aspect ratio inside that box (fit: contain). align: left | center | right.
+#let b-image(b) = {
+  let w = if "width" in b { len(b.width) } else if "height" in b { auto } else { 100% }
+  let h = if "height" in b { len(b.height) } else { auto }
+  let a = b.at("align", default: "center")
+  let im = image(resolve(b.src), width: w, height: h, fit: "contain", alt: b.at("alt", default: none))
+  let body = align(if a == "left" { left } else if a == "right" { right } else { center }, im)
+  if "caption" in b {
+    stack(dir: ttb, spacing: 1.6mm, body, styled(b, text(size: b.at("caption_size", default: data.at("size", default: 11) - 1) * 1pt, fill: muted)[#runs(b.caption)]))
+  } else { body }
+}
+
 #let render-one(b, recurse) = {
   let t = b.at("type", default: "text")
   if t == "header" { b-header(b) }
@@ -330,6 +345,7 @@
   else if t == "lines" { b-lines(b) }
   else if t == "cut" { b-cut(b) }
   else if t == "space" { v(b.at("h", default: 4) * 1mm) }
+  else if t == "image" { b-image(b) }
   else if t == "pagebreak" { pagebreak(weak: true) }
   else if t == "columns" {
     let cs = b.cols
