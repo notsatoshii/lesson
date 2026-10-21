@@ -3,7 +3,7 @@
 
 Usage: python storyboard.py <media-brief.md> --out out.mp4 [--audio <dir>] [--size phone|landscape|WxH]
                             [--engine auto|revideo|ffmpeg] [--scene scene.json] [--scene-only]
-                            [--gap 0.4] [--font "Noto Sans KR"] [--keep]
+                            [--gap 0.4] [--font "Noto Sans KR"] [--keep] [--srt out.srt]
 
 Reads the brief's video storyboard table (columns t | on screen | voice / caption | note), writes a
 scene JSON, and renders one beat per row: the "on screen" text, or an image when the cell names a
@@ -13,6 +13,14 @@ headline above it), with the caption column burned in as caption pages.
 Timing: the t column ("0-5 s", "5–12s", "0:05-0:12", or a bare "4 s" duration). With --audio <dir>
 (one MP3 per row, e.g. tools/narrate.py output), each row lasts its MP3 plus --gap seconds, the MP3s
 are joined into the soundtrack, and an <name>.srt beside an MP3 times that row's caption pages.
+
+Tall stage: a row whose note cell says "stage: tall" puts its picture under a one-line headline and runs
+the picture area down to a caption bar pinned at the frame's foot at its own height (lines x line height +
+padding), or to the bottom padding when the row has no caption; the picture shows at up to 1.0. Every
+image row records its picture size and scale in the scene JSON (screen.size, screen.scale).
+
+--srt <path>: an SRT of the caption pages at their final times on the video timeline (row starts, gaps
+and silent holds included, the engine's fade-in respected), written after the render.
 
 Engines: revideo (the Revideo project in this folder, headless Chrome) or ffmpeg (Pillow frames +
 ffmpeg concat, no motion). auto tries revideo and falls back to ffmpeg if it fails; the JSON summary
@@ -77,6 +85,8 @@ def parse_theme(spec, bg=None):
         theme[k] = v
     return theme
 PLACEHOLDER_RE = re.compile(r"^\s*[\"“”']?\s*<[^>]*>\s*[\"“”']?\s*$")
+TALL_RE = re.compile(r"\bstage\s*:\s*tall\b", re.I)
+FADE = 0.25  # the Revideo scene's fade in and out per row (storyboard.tsx); a caption shows after the fade-in
 QUOTES = "\"'“”‘’「」『』"
 warnings = []
 
@@ -352,8 +362,11 @@ def build_scene(brief, size, audio_dir, gap, font, theme=None):
         start, dur = parse_t(get(ct))
         img, rest = find_image(screen_cell, base)
         screen = {"kind": "image", "path": img, "text": rest} if img else {"kind": "text", "text": rest}
+        note = get(cn)
+        if TALL_RE.search(note or ""):
+            screen["stage"] = "tall"
         rows.append({"index": len(rows) + 1, "table_n": table_n, "t": get(ct), "start_hint": start, "duration": dur,
-                     "screen": screen, "caption": clean_caption(cap_cell), "note": get(cn)})
+                     "screen": screen, "caption": clean_caption(cap_cell), "note": note})
     if not rows:
         sys.exit("error: the storyboard table has no filled rows")
 
@@ -387,6 +400,7 @@ def build_scene(brief, size, audio_dir, gap, font, theme=None):
              "theme": theme or dict(THEME), "layout": layout(w, h), "duration": round(t, 3), "rows": rows,
              "ffmpeg": shutil.which("ffmpeg") or ""}
     prewrap(scene)
+    place_pictures(scene)
     return scene
 
 
@@ -450,6 +464,103 @@ def prewrap(scene):
             r["screen"]["text"] = "\n".join(break_lines(head, measurer("bold", px), L["head_w"] * safe))
 
 
+def image_size(path):
+    """(width, height) of a raster picture; None for SVG or when it cannot be read."""
+    if path.lower().endswith(".svg"):
+        return None
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            return im.size
+    except ImportError:
+        with open(path, "rb") as f:
+            head = f.read(24)
+        if head[:8] == b"\x89PNG\r\n\x1a\n":
+            return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+    except OSError:
+        pass
+    return None
+
+
+def place_pictures(scene):
+    """Record each picture's size and scale; lay out tall-stage rows (screen.frame, used by both engines).
+
+    Default rows keep the old layout in both engines; their scale is the Revideo engine's fit (the default
+    engine). A tall row: headline (one line) at the top padding, the picture card under it, and a caption
+    bar pinned at the frame's foot at its own height, so the picture area is the space between them."""
+    W, H, L = scene["width"], scene["height"], scene["layout"]
+    pad, cap_px = L["pad"], L["cap_px"]
+    cpad = pad * 0.3                      # card padding (both engines)
+    gap = pad * 0.6                       # headline to card, as in the default stage
+    max_w = W - pad * 2.6
+    for r in scene["rows"]:
+        scr = r["screen"]
+        if not scr.get("path"):
+            if scr.get("stage") == "tall":
+                warn(f"row {r['index']}: stage: tall needs a picture; the row uses the default stage")
+                del scr["stage"]
+            continue
+        size = image_size(scr["path"])
+        head = scr.get("text") or ""
+        n_head = len(head.split("\n")) if head else 0
+        head_px = scr.get("head_px", L["head_px"])
+        if scr.get("stage") != "tall":
+            if size:  # the Revideo fit: stage height minus headline block and padding
+                stage_h = H - L["cap_bottom"] * 2 - cap_px * 4
+                head_h = head_px * 1.3 * n_head + pad * 0.6 if head else 0
+                k = min(1.0, max_w / size[0], (stage_h - head_h - pad) / size[1])
+                scr["size"], scr["scale"] = list(size), round(k, 3)
+            continue
+        if n_head > 1:
+            warn(f"row {r['index']}: stage: tall wants a one-line headline; it wraps to {n_head} lines")
+        lines = max([len(c["text"].split("\n")) for c in r["captions"]] or [0])
+        cap_h = lines * cap_px * 1.35 + cap_px * 0.9 if lines else 0
+        foot = round(pad * 0.5)                               # the caption bar's gap to the frame's foot
+        head_top = pad
+        head_h = head_px * 1.3 * n_head
+        card_top = head_top + head_h + (gap if head else 0)
+        bottom = (H - foot - cap_h - pad * 0.3) if lines else (H - pad)   # card bottom limit
+        area_h = bottom - card_top - cpad * 2
+        if not size:
+            warn(f"row {r['index']}: stage: tall cannot read the picture size ({os.path.basename(scr['path'])}); default stage")
+            del scr["stage"]
+            continue
+        k = min(1.0, max_w / size[0], area_h / size[1])
+        iw, ih = round(size[0] * k), round(size[1] * k)
+        scr["size"], scr["scale"] = list(size), round(k, 3)
+        scr["frame"] = {"head_top": round(head_top, 1), "head_h": round(head_h, 1),
+                        "card": [round((W - iw) / 2 - cpad, 1), round(card_top, 1), round(iw + cpad * 2, 1),
+                                 round(ih + cpad * 2, 1)],
+                        "img": [iw, ih], "cpad": round(cpad, 1), "area": [round(max_w), round(area_h)],
+                        "cap_foot": foot, "cap_h": round(cap_h, 1)}
+
+
+def srt_time(t):
+    ms = int(round(max(0.0, t) * 1000))
+    return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+
+
+def write_srt(scene, path, engine):
+    """The burned-in caption pages at their times on the final timeline. The Revideo scene shows a row's
+    first page only after the row's fade-in, so that start is moved to match; ffmpeg cuts are exact."""
+    cues = []
+    for r in scene["rows"]:
+        fade_in = min(FADE, r["duration"] / 4) if engine == "revideo" else 0.0
+        for c in r["captions"]:
+            a = r["start"] + max(c["start"], fade_in)
+            z = r["start"] + c["end"]
+            if z - a > 0.01:
+                cues.append((a, z, c["text"]))
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        for i, (a, z, txt) in enumerate(cues, 1):
+            f.write(f"{i}\n{srt_time(a)} --> {srt_time(z)}\n{txt}\n\n")
+    if not cues:
+        warn("--srt: the storyboard has no captions; wrote an empty SRT")
+    return {"path": os.path.abspath(path), "cues": len(cues),
+            "first_start": round(cues[0][0], 3) if cues else None,
+            "last_end": round(cues[-1][1], 3) if cues else None}
+
+
 def with_data_uris(scene):
     s = json.loads(json.dumps(scene))
     for r in s["rows"]:
@@ -502,38 +613,54 @@ def draw_frame(scene, row, caption, path):
     d = ImageDraw.Draw(img)
     stage_top, stage_bottom = pad, H - cap_bottom - cap_px * 4
     scr = row["screen"]
-    blocks = []
-    head = scr.get("text") or ""
-    if head:
-        f = load_font("bold", scr.get("head_px", L["head_px"]))
-        lines = wrap(d, head, f, L["head_w"])
-        lh = round(f.size * 1.3)
-        blocks.append(("text", lines, f, lh, lh * len(lines)))
-    if scr.get("path"):
-        if scr["path"].lower().endswith(".svg"):
-            warn(f"row {row['index']}: the ffmpeg engine cannot draw SVG; use a PNG export")
-        else:
-            pic = Image.open(scr["path"]).convert("RGBA")
-            used = sum(b[4] for b in blocks) + (pad * 0.6 if blocks else 0)
-            max_w, max_h = W - pad * 2.6, stage_bottom - stage_top - used - pad
-            k = min(max_w / pic.width, max_h / pic.height)
-            pic = pic.resize((max(1, int(pic.width * k)), max(1, int(pic.height * k))), Image.LANCZOS)
-            cpad = round(pad * 0.3)
-            blocks.append(("pic", pic, cpad, None, pic.height + cpad * 2))
-    gap = round(pad * 0.6)
-    total = sum(b[4] for b in blocks) + gap * max(0, len(blocks) - 1)
-    y = stage_top + (stage_bottom - stage_top - total) / 2
-    for b in blocks:
-        if b[0] == "text":
-            _, lines, f, lh, _ = b
-            for i, line in enumerate(lines):
-                d.text(((W - d.textlength(line, font=f)) / 2, y + i * lh), line, font=f, fill=th["ink"])
-        else:
-            _, p, cpad, _, bh = b
-            x0 = (W - p.width) / 2 - cpad
-            d.rounded_rectangle([x0, y, x0 + p.width + cpad * 2, y + bh], radius=24, fill=th["card"])
-            img.paste(p, (int(x0 + cpad), int(y + cpad)), p)
-        y += b[4] + gap
+    fr = scr.get("frame")
+    if fr:  # tall stage: positions come from the scene (place_pictures), the caption bar sits at the foot
+        head = scr.get("text") or ""
+        if head:
+            f = load_font("bold", scr.get("head_px", L["head_px"]))
+            lh = round(f.size * 1.3)
+            for i, line in enumerate(head.split("\n")):
+                d.text(((W - d.textlength(line, font=f)) / 2, fr["head_top"] + i * lh), line, font=f, fill=th["ink"])
+        x0, y0, cw, ch = fr["card"]
+        d.rounded_rectangle([x0, y0, x0 + cw, y0 + ch], radius=24, fill=th["card"])
+        pic = Image.open(scr["path"]).convert("RGBA")
+        if list(pic.size) != fr["img"]:
+            pic = pic.resize(tuple(fr["img"]), Image.LANCZOS)
+        img.paste(pic, (round(x0 + fr["cpad"]), round(y0 + fr["cpad"])), pic)
+        cap_bottom = fr["cap_foot"]
+    if not fr:  # default stage: headline and picture centred above the caption band
+        blocks = []
+        head = scr.get("text") or ""
+        if head:
+            f = load_font("bold", scr.get("head_px", L["head_px"]))
+            lines = wrap(d, head, f, L["head_w"])
+            lh = round(f.size * 1.3)
+            blocks.append(("text", lines, f, lh, lh * len(lines)))
+        if scr.get("path"):
+            if scr["path"].lower().endswith(".svg"):
+                warn(f"row {row['index']}: the ffmpeg engine cannot draw SVG; use a PNG export")
+            else:
+                pic = Image.open(scr["path"]).convert("RGBA")
+                used = sum(b[4] for b in blocks) + (pad * 0.6 if blocks else 0)
+                max_w, max_h = W - pad * 2.6, stage_bottom - stage_top - used - pad
+                k = min(max_w / pic.width, max_h / pic.height)
+                pic = pic.resize((max(1, int(pic.width * k)), max(1, int(pic.height * k))), Image.LANCZOS)
+                cpad = round(pad * 0.3)
+                blocks.append(("pic", pic, cpad, None, pic.height + cpad * 2))
+        gap = round(pad * 0.6)
+        total = sum(b[4] for b in blocks) + gap * max(0, len(blocks) - 1)
+        y = stage_top + (stage_bottom - stage_top - total) / 2
+        for b in blocks:
+            if b[0] == "text":
+                _, lines, f, lh, _ = b
+                for i, line in enumerate(lines):
+                    d.text(((W - d.textlength(line, font=f)) / 2, y + i * lh), line, font=f, fill=th["ink"])
+            else:
+                _, p, cpad, _, bh = b
+                x0 = (W - p.width) / 2 - cpad
+                d.rounded_rectangle([x0, y, x0 + p.width + cpad * 2, y + bh], radius=24, fill=th["card"])
+                img.paste(p, (int(x0 + cpad), int(y + cpad)), p)
+            y += b[4] + gap
     if caption:
         f = load_font("regular", cap_px)
         lines = wrap(d, caption, f, L["cap_w"])
@@ -613,6 +740,8 @@ def main():
     ap.add_argument("--theme", help="colours as key=#hex pairs (bg, ink, card, capBg, capInk, accent), "
                                     "comma-separated, or a JSON object / file; unset keys keep the default")
     ap.add_argument("--bg", help="background colour (#hex); shortcut for --theme bg=#hex")
+    ap.add_argument("--srt", help="also write an SRT of the burned-in caption pages, timed to the final video "
+                                  "(row starts, gaps and silent holds included)")
     a = ap.parse_args()
 
     if a.size in SIZES:
@@ -629,6 +758,8 @@ def main():
         with open(a.scene, "w", encoding="utf-8") as f:
             json.dump(scene, f, ensure_ascii=False, indent=2)
     if a.scene_only:
+        if a.srt:  # the timeline the chosen engine would render (auto: Revideo)
+            write_srt(scene, a.srt, "ffmpeg" if a.engine == "ffmpeg" else "revideo")
         if not a.scene:
             print(json.dumps(scene, ensure_ascii=False, indent=2))
         return 0
@@ -662,11 +793,18 @@ def main():
             print("work folder: " + work, file=sys.stderr)
         else:
             shutil.rmtree(work, ignore_errors=True)
+    srt = write_srt(scene, a.srt, engine_used) if a.srt else None
     summary = {"ok": True, "out": out, "engine": engine_used, "rows": len(scene["rows"]),
                "planned_duration": scene["duration"], **probe(out),
                "captions": sum(len(r["captions"]) for r in scene["rows"]),
                "caption_source": sorted({r["caption_source"] for r in scene["rows"]}),
+               "pictures": [{"row": r["index"], "scale": r["screen"].get("scale"),
+                             **({"stage": "tall"} if r["screen"].get("frame") else {})}
+                            for r in scene["rows"] if r["screen"].get("path")],
                "warnings": warnings}
+    if srt:
+        srt["last_end_vs_video"] = round(summary["duration"] - srt["last_end"], 3) if srt["last_end"] else None
+        summary["srt"] = srt
     if errors:
         summary["fallback_reason"] = errors
     print(json.dumps(summary, ensure_ascii=False, indent=2))
