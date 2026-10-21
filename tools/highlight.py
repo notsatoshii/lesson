@@ -3,13 +3,14 @@
 
 Usage: python highlight.py <screenshot.png> --spec <brief.md> [--out <path>] [--scale 1.0] [--size 1.0] [--color #FF4D2E]
        python highlight.py <screenshot.png> --box x,y,w,h[,"label"] --arrow x1,y1,x2,y2 --badge x,y,n
-                                            --blur x,y,w,h --crop x,y,w,h
+                                            --blur x,y,w,h --crop x,y,w,h [--no-badge]
        python highlight.py --demo [--out <path>]
 
 Draws rounded boxes, arrows with a filled head, numbered badges, label pills and blurred regions on a
 screenshot, in one accent colour. --spec reads the numbered callouts list from a media brief's
 screenshot+highlights section; the inline flags do the same by hand. All coordinates are measured on
-the original screenshot; a crop is applied first and later shapes are shifted to match. Output goes
+the original screenshot; a crop is applied first and later shapes are shifted to match. --no-badge
+keeps the label pills but drops the number badges on boxes and arrows. Output goes
 to <name>.hl.png beside the input unless --out is given.
 """
 import argparse
@@ -179,24 +180,37 @@ def draw_badge(d, cx, cy, n, color, font):
     d.text((cx - (rgt - l) / 2 - l, cy - (b - t) / 2 - t), text, font=font, fill="white")
 
 
-def draw_label(d, img_w, img_h, x, y, w, h, text, color, font, pad=(10, 5), arrow=False):
+def draw_label(d, img_w, img_h, x, y, w, h, text, color, font, pad=(10, 5), arrow=False, badge=True, head=None):
     pad = (pad[0] * SIZE, pad[1] * SIZE)
     l, t, rgt, b = d.textbbox((0, 0), text, font=font)
     tw, th = rgt - l, b - t
     pw, ph = tw + pad[0] * 2, th + pad[1] * 2
     gap = 6 * SIZE
-    px = min(max(x + BADGE * SIZE / 2 + gap, 0), img_w - pw)  # right of the badge at the top-left corner
-    if arrow:  # beside the badge at the arrow's tail, vertically centred, so the two never overlap
+    if badge:
+        px = x + BADGE * SIZE / 2 + gap  # right of the badge at the top-left corner
+    elif arrow:
+        px = x - pw / 2  # no badge: the pill sits on the arrow's tail, centred on it
+    else:
+        px = x  # no badge: the pill starts at the box's left edge
+    if arrow and not badge and head:  # the tail touches the pill on the side away from the head
+        hx, hy = head
+        if abs(hy - y) >= abs(hx - x):
+            py = y if hy < y else y - ph
+        else:
+            px, py = (x - pw if hx > x else x), y - ph / 2
+    elif arrow:  # beside the badge at the arrow's tail, vertically centred, so the two never overlap
         py = y - ph / 2
     else:
         py = y - ph - gap if y - ph - gap >= 0 else y + h + gap  # above the box, else below
+    px = min(max(px, 0), img_w - pw)
     py = max(py, 0)
     py = min(py, img_h - ph)
     d.rounded_rectangle([px, py, px + pw, py + ph], radius=ph / 2, fill=color)
     d.text((px + pad[0] - l, py + pad[1] - t), text, font=font, fill="white")
 
 
-def render(img, items, color=ACCENT, scale=1.0, font_path=None, size=1.0):
+def render(img, items, color=ACCENT, scale=1.0, font_path=None, size=1.0, badges_on=True):
+    """badges_on=False (--no-badge) drops the number badge on boxes and arrows; explicit badge items stay."""
     global SIZE
     SIZE = size
     stroke = max(1, round(STROKE * SIZE))
@@ -224,22 +238,22 @@ def render(img, items, color=ACCENT, scale=1.0, font_path=None, size=1.0):
         if it["kind"] == "box":
             x, y, w, h = sc(it["x"]) - ox, sc(it["y"]) - oy, sc(it["w"]), sc(it["h"])
             d.rounded_rectangle([x, y, x + w, y + h], radius=RADIUS * SIZE, outline=color, width=stroke)
-            if it.get("n"):
+            if it.get("n") and badges_on:
                 badges.append((x, y, it["n"]))
             if it.get("label"):
-                labels.append((x, y, w, h, it["label"], False))
+                labels.append((x, y, w, h, it["label"], False, None))
         elif it["kind"] == "arrow":
             x1, y1, x2, y2 = sc(it["x1"]) - ox, sc(it["y1"]) - oy, sc(it["x2"]) - ox, sc(it["y2"]) - oy
             bx, by = arrow_head(d, x1, y1, x2, y2, color)
             d.line([(x1, y1), (bx, by)], fill=color, width=stroke)
-            if it.get("n"):
+            if it.get("n") and badges_on:
                 badges.append((x1, y1, it["n"]))
             if it.get("label"):
-                labels.append((x1, y1, 0, 0, it["label"], True))
+                labels.append((x1, y1, 0, 0, it["label"], True, (x2, y2)))
         elif it["kind"] == "badge":
             badges.append((sc(it["x"]) - ox, sc(it["y"]) - oy, it["n"]))
-    for x, y, w, h, text, is_arrow in labels:
-        draw_label(d, W, H, x, y, w, h, text, color, font, arrow=is_arrow)
+    for x, y, w, h, text, is_arrow, head in labels:
+        draw_label(d, W, H, x, y, w, h, text, color, font, arrow=is_arrow, badge=badges_on, head=head)
     for x, y, n in badges:
         draw_badge(d, x, y, n, color, badge_font)
     return img, used
@@ -274,6 +288,8 @@ def main():
     ap.add_argument("--blur", action="append", metavar="x,y,w,h")
     ap.add_argument("--crop", metavar="x,y,w,h")
     ap.add_argument("--demo", action="store_true", help="render a grey 800x500 test image with sample callouts")
+    ap.add_argument("--no-badge", action="store_true",
+                    help="draw boxes and arrows with their label pill but no number badge (explicit --badge stays)")
     a = ap.parse_args()
 
     warnings = []
@@ -303,7 +319,7 @@ def main():
         out = a.out or root + ".hl.png"
         source = a.screenshot
 
-    result, font_used = render(img, items, a.color, a.scale, a.font, a.size)
+    result, font_used = render(img, items, a.color, a.scale, a.font, a.size, badges_on=not a.no_badge)
     result.save(out)
     counts = {}
     for it in items:

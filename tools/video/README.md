@@ -17,6 +17,7 @@ Set `PUPPETEER_SKIP_DOWNLOAD=true` before `npm install` to skip the Puppeteer br
 python tools/video/storyboard.py docs/lessons/<slug>/media/M3-video.md --out out.mp4
 python tools/video/storyboard.py <brief.md> --out out.mp4 --audio <narrate.py out dir>
 python tools/video/storyboard.py <brief.md> --out out.mp4 --size landscape --engine ffmpeg
+python tools/video/storyboard.py <brief.md> --out out.mp4 --theme "bg=#F6F3FB,ink=#221F38,accent=#D93D22,capBg=#221F38"
 python tools/video/storyboard.py <brief.md> --scene-only --scene scene.json
 ```
 
@@ -28,6 +29,8 @@ python tools/video/storyboard.py <brief.md> --scene-only --scene scene.json
 | `--scene` / `--scene-only` | write the scene JSON (rows, timing, caption pages, layout) |
 | `--font` | font family for Revideo (default Noto Sans KR when installed, else Malgun Gothic) |
 | `--keep` | keep the work folder (frames, soundtrack, scene) |
+| `--theme` | colours for both engines as `key=#hex` pairs, comma-separated (`bg=#F6F3FB,ink=#221F38,capBg=#221F38`), or a JSON object or file; keys `bg` (background), `ink` (headline), `card` (picture card), `capBg` / `capInk` (caption pill), `accent`. Unset keys keep the defaults; an unknown key warns, a value that is not a hex colour stops the run |
+| `--bg` | the background colour alone; shortcut for `--theme bg=#hex` |
 
 ## What each row becomes
 

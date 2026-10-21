@@ -44,6 +44,38 @@ FONT_FILES = {
 }
 THEME = {"bg": "#F7F5F2", "ink": "#1A1A1A", "card": "#FFFFFF", "capBg": "#111111", "capInk": "#FFFFFF",
          "accent": "#FF4D2E"}
+HEX_RE = re.compile(r"^#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$")
+
+
+def parse_theme(spec, bg=None):
+    """--theme 'bg=#F6F3FB,ink=#221F38' or a JSON file / JSON object; --bg is a shortcut for bg=. Unknown keys warn."""
+    theme = dict(THEME)
+    pairs = {}
+    if spec:
+        s = spec.strip()
+        if s.startswith("{"):
+            pairs = json.loads(s)
+        elif os.path.isfile(s):
+            with open(s, encoding="utf-8") as f:
+                pairs = json.load(f)
+        else:
+            for part in s.split(","):
+                if not part.strip():
+                    continue
+                if "=" not in part:
+                    sys.exit(f"error: --theme part '{part}' is not key=#hex")
+                k, v = part.split("=", 1)
+                pairs[k.strip()] = v.strip()
+    if bg:
+        pairs["bg"] = bg
+    for k, v in pairs.items():
+        if k not in THEME:
+            warn(f"--theme: unknown key '{k}' (known: {', '.join(THEME)}); ignored")
+            continue
+        if not HEX_RE.match(str(v)):
+            sys.exit(f"error: --theme {k}={v} is not a #hex colour")
+        theme[k] = v
+    return theme
 PLACEHOLDER_RE = re.compile(r"^\s*[\"“”']?\s*<[^>]*>\s*[\"“”']?\s*$")
 QUOTES = "\"'“”‘’「」『』"
 warnings = []
@@ -298,7 +330,7 @@ def mux(video, audio, out, total):
 
 # ---------- scene ----------
 
-def build_scene(brief, size, audio_dir, gap, font):
+def build_scene(brief, size, audio_dir, gap, font, theme=None):
     with open(brief, encoding="utf-8") as f:
         text = f.read()
     header, raw = find_storyboard(text)
@@ -352,7 +384,7 @@ def build_scene(brief, size, audio_dir, gap, font):
             r["caption_source"] = "script"
         del r["start_hint"]
     scene = {"source": os.path.abspath(brief), "width": w, "height": h, "fps": FPS, "font": font,
-             "theme": THEME, "layout": layout(w, h), "duration": round(t, 3), "rows": rows,
+             "theme": theme or dict(THEME), "layout": layout(w, h), "duration": round(t, 3), "rows": rows,
              "ffmpeg": shutil.which("ffmpeg") or ""}
     prewrap(scene)
     return scene
@@ -578,6 +610,9 @@ def main():
     ap.add_argument("--gap", type=float, default=0.4, help="seconds of silence after each MP3 (default 0.4)")
     ap.add_argument("--font", help="font family for the revideo engine (default Noto Sans KR if installed, else Malgun Gothic)")
     ap.add_argument("--keep", action="store_true", help="keep the work folder (frames, soundtrack, scene)")
+    ap.add_argument("--theme", help="colours as key=#hex pairs (bg, ink, card, capBg, capInk, accent), "
+                                    "comma-separated, or a JSON object / file; unset keys keep the default")
+    ap.add_argument("--bg", help="background colour (#hex); shortcut for --theme bg=#hex")
     a = ap.parse_args()
 
     if a.size in SIZES:
@@ -589,7 +624,7 @@ def main():
         size = (int(m.group(1)) // 2 * 2, int(m.group(2)) // 2 * 2)
     noto = ["C:/Windows/Fonts/NotoSansKR-VF.ttf", "C:/Windows/Fonts/NotoSansKR-Regular.ttf"]
     font = a.font or ("Noto Sans KR" if any(os.path.exists(p) for p in noto) else "Malgun Gothic")
-    scene = build_scene(a.brief, size, a.audio, a.gap, font)
+    scene = build_scene(a.brief, size, a.audio, a.gap, font, parse_theme(a.theme, a.bg))
     if a.scene:
         with open(a.scene, "w", encoding="utf-8") as f:
             json.dump(scene, f, ensure_ascii=False, indent=2)
